@@ -1,0 +1,65 @@
+{
+  "H1_opportunity": {
+    "decisive": 216,
+    "states": 819,
+    "rate": 0.26373626373626374
+  },
+  "H1_oracle_vs_ce": {
+    "n_questions": 350,
+    "mean": 0.1422285385180122,
+    "ci95": [
+      0.11747127739984883,
+      0.1683713297284726
+    ],
+    "excludes_zero": true
+  },
+  "H1_PASS": true,
+  "n_pairs": {
+    "total": 3224,
+    "conflicting": 1684,
+    "aligned": 1540
+  },
+  "H2a_specialist_transfer": {
+    "acc": 0.6597387173396675,
+    "n": 1684,
+    "binomial_p": 4.364705033788783e-40
+  },
+  "H2a_PASS": true,
+  "confirmatory_directions": {
+    "query_align_neg": true,
+    "doc_len_neg": true,
+    "query_align": {
+      "coef": -1.905252701596689,
+      "bootstrap_sign_stability": 1.0
+    },
+    "doc_len": {
+      "coef": -3.8161671557565757,
+      "bootstrap_sign_stability": 1.0
+    }
+  },
+  "directions_PASS": true,
+  "exploratory_signature": {
+    "redundancy": {
+      "coef": 1.1399838776905624,
+      "bootstrap_sign_stability": 0.986
+    },
+    "novelty": {
+      "coef": 1.7425323862630882,
+      "bootstrap_sign_stability": 1.0
+    },
+    "entity_gain": {
+      "coef": -0.34176573940535815,
+      "bootstrap_sign_stability": 1.0
+    },
+    "gap_coverage": {
+      "coef": 0.07573035130455258,
+      "bootstrap_sign_stability": 0.584
+    }
+  },
+  "exploratory_ceiling": {
+    "aligned_expert_on_aligned": 0.7681818181818182,
+    "conflicting_expert_on_conflicting": 0.6597387173396675,
+    "ceiling": 0.7115384615384616,
+    "aligned_only_baseline": 0.5437344913151365
+  }
+}

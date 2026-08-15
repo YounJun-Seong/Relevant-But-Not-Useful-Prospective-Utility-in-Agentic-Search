@@ -1,0 +1,11 @@
+vllm>=0.10
+torch
+transformers
+datasets
+numpy
+scipy
+scikit-learn
+bm25s
+PyStemmer
+joblib
+matplotlib

@@ -1,0 +1,22 @@
+{
+  "auc_gbm": 0.6103747204997287,
+  "auc_transformer": 0.6734831564643786,
+  "auc_ensemble": 0.6906160160627095,
+  "mixture_gbm": {
+    "overall": 0.5903853794199444,
+    "disagreement": 0.40474174428450466,
+    "agreement": 0.7544910179640718
+  },
+  "mixture_transformer": {
+    "overall": 0.6034962256654748,
+    "disagreement": 0.4521591871295512,
+    "agreement": 0.7372754491017964
+  },
+  "mixture_ensemble": {
+    "overall": 0.6027016289233215,
+    "disagreement": 0.3954276037256562,
+    "agreement": 0.7859281437125748
+  },
+  "verdict": "FAIL",
+  "criteria": "AUC>=0.70 AND mixture>=0.66 (R14 pre-registered)"
+}

@@ -1,0 +1,406 @@
+{
+  "selected": [
+    {
+      "question_id": "5ade450b5542997c77adedc5",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae616ce5542992663a4f259",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ac39f7b554299218029dbe7",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a893f305542993b751ca91e",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8f7a135542992414482adc",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a7647b85542992d0ec0608a",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ab8919655429934fafe6e13",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ac298f9554299657fa28fc9",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8b2f2b5542995d1e6f12fa",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a81d1f0554299676cceb0ee",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ac26b7f55429951e9e685ae",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a70f0e75542994082a3e408",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae6363b55429929b0807af0",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a7331de5542994cef4bc4a8",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae64ad25542995703ce8b4f",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae1d1a55542997f29b3c138",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae60484554299546bf8301a",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a7c8ae855429935c91b5207",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8d5ec2554299585d9e37c4",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5adcfebe5542992c1e3a24f3",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8b128455429971feec463b",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a832f9d5542993344745fe4",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a7621bb554299109176e650",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ac3a2f35542993915413856",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8d8eb5554299068b959d3a",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5adea83b55429975fa854f53",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ac55ea55542993e66e82377",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a88a5645542997e5c09a679",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a7555215542996c70cfaee1",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5abe2b0155429976d4830a83",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ab639e65542995eadeeff7f",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5abe3c7555429965af743ea5",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a81346055429926c1cdad13",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a79fe3b5542994f819ef119",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a79e3925542994bb9457130",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a716f575542994082a3e82f",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a7a1f795542996c55b2dd1b",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8f2fed55429918e830d1c7",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a73b1855542992d56e7e388",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a81108855429926c1cdace2",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8b8f5b55429949d91db5e1",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae13f3c5542997b2ef7d168",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a75d9c05542992db94736f6",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ac49a1c5542996feb3fe905",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5adea95055429939a52fe931",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8d8e4f5542994ba4e3dca7",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae530e355429908b6326561",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a771ead55429966f1a36c7c",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8ce15d554299653c1aa12f",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5ae4be5c5542995ad6573e3a",
+      "stratum": "fail_enriched"
+    },
+    {
+      "question_id": "5a8f186055429918e830d186",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a90386455429916514e7435",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7642f7554299109176e6e8",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab5b6c1554299637185c5e5",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7320565542991f9a20c61d",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5abea7c25542990832d3a068",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a81b2505542995ce29dcc32",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8cee9b554299441c6b9f87",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a71214d5542994082a3e5b9",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ae658855542992ae0d162e3",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a84c5545542991dd0999dee",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ae3a8985542992f92d82329",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7e7ed05542991319bc94c2",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a825b0e55429954d2e2eb0c",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8ba60b554299240d9c205b",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7e040f5542990b8f503b13",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab2a186554299295394677b",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ac2ffbd554299677310267b",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab54056554299488d4d9923",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8a09765542992d82986e67",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7296815542991f9a20c515",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ae356045542990afbd1e10d",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5adf4b335542993a75d264a5",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ac4e13f554299076e296e2d",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a83161555429940e5e1a958",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab43179554299233955004d",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab568af554299494045efaf",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab8372255429919ba4e226b",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab2be71554299166977408c",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5adbda2755429944faac2385",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7f924c55429969796c1aba",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a750de95542993748c897ac",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5abe407155429976d4830ab4",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8db42f5542994ba4e3dd11",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a847edd554299123d8c2272",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8c8502554299585d9e36d0",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5adeacf955429975fa854f66",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a773ec45542994aec3b7245",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ae5c212554299546bf82f4b",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8574945542997b5ce3fffb",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab94fa25542996be2020474",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a8198565542995ce29dcc13",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5abee41a5542993fe9a41d79",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a72a51355429901807daf21",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ae3eabc5542995dadf2424f",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5adfb60655429942ec259b08",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a769b115542993569682c51",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab3eac5554299753aec59ec",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5a7a2dac5542990198eaf0b6",
+      "stratum": "representative"
+    },
+    {
+      "question_id": "5ab91f98554299753720f70d",
+      "stratum": "representative"
+    }
+  ],
+  "pre_path": "results/base_pre300_t4_d3.jsonl",
+  "n_fail_pool": 169
+}

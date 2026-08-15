@@ -1,0 +1,21 @@
+{
+  "n_questions": 30,
+  "n_states": 62,
+  "states_per_question": 2.066666666666667,
+  "n_arms": 806,
+  "arms_per_question": 26.866666666666667,
+  "total_gen_tokens": 45854,
+  "tokens_per_rollout": 54.84928229665072,
+  "timings_sec": {
+    "model_load_sec": 183.4193663597107,
+    "phase_A_sec": 32.726537227630615,
+    "phase_B_plan_sec": 140.98029375076294,
+    "phase_B_sec": 84.0189151763916
+  },
+  "base_em": 0.5666666666666667,
+  "base_f1": 0.642929292929293,
+  "replay_consistency": 0.9516129032258065,
+  "reliability_answer_agreement": 0.9354838709677419,
+  "frac_dEM_zero": 0.9290322580645162,
+  "n_utility_rows": 310
+}

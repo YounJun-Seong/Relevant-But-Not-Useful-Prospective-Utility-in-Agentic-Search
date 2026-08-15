@@ -1,0 +1,74 @@
+{
+  "H1_opportunity": {
+    "decisive": 201,
+    "states": 686,
+    "rate": 0.29300291545189505
+  },
+  "H1_oracle_vs_ce": {
+    "n_questions": 350,
+    "mean": 0.11658958735009152,
+    "ci95": [
+      0.09242912316441732,
+      0.14170480313337455
+    ],
+    "excludes_zero": true
+  },
+  "H1_PASS": true,
+  "H2_specialist": {
+    "acc": 0.6918852959121415,
+    "n": 1639,
+    "binomial_p": 6.272257442150601e-56
+  },
+  "H2_coefficients": {
+    "query_align": {
+      "coef": -2.452570153602291,
+      "direction_replicates": true,
+      "bootstrap_sign_stability": 1.0
+    },
+    "doc_len": {
+      "coef": -2.7261786651692455,
+      "direction_replicates": true,
+      "bootstrap_sign_stability": 1.0
+    },
+    "redundancy": {
+      "coef": -1.4119724278825196,
+      "direction_replicates": false,
+      "bootstrap_sign_stability": 0.998
+    },
+    "novelty": {
+      "coef": -0.20707755916563506,
+      "direction_replicates": false,
+      "bootstrap_sign_stability": 0.766
+    }
+  },
+  "H2_PASS": false,
+  "H3": {
+    "gate_auc": {
+      "gbm": 0.5753416398071868,
+      "transformer": 0.6326291970266635,
+      "ensemble": 0.6414047800823515
+    },
+    "ceiling": 0.7622355541521945,
+    "baseline_aligned_only": 0.566782443953268,
+    "mixtures": {
+      "gbm": {
+        "overall": 0.5421534575307863,
+        "conflicting": 0.363026235509457,
+        "aligned": 0.7342931937172775
+      },
+      "transformer": {
+        "overall": 0.5560467319229555,
+        "conflicting": 0.4069554606467358,
+        "aligned": 0.7159685863874345
+      },
+      "ens": {
+        "overall": 0.5626776128828544,
+        "conflicting": 0.350823672971324,
+        "aligned": 0.7899214659685864
+      }
+    },
+    "best_mixture": 0.5626776128828544,
+    "recovery_ratio": -0.021001615508885067
+  },
+  "H3_limited_confirmed": true
+}

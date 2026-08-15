@@ -1,0 +1,14 @@
+{
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "index": "data/bm25_index",
+  "n_questions": 30,
+  "max_turns": 4,
+  "docs_per_search": 3,
+  "reliability_frac": 0.1,
+  "reliability_replays": 2,
+  "seed": 42,
+  "out": "results/gate0",
+  "gpu_mem": 0.25,
+  "prompt_version": "v1",
+  "config_hash": "90a8be2242"
+}
