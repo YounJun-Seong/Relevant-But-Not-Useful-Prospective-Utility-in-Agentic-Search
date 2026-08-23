@@ -1,0 +1,192 @@
+{
+  "HotpotQA dev": {
+    "A_pair_definition": {
+      "decided_pairs": 2517,
+      "ce_aligned": 1336,
+      "ce_conflicting": 1181,
+      "conflicting_share": 0.4692093762415574,
+      "both_docs_outside_ce_top20": 474,
+      "share_of_conflicting_that_is_both_unranked": 0.40135478408128705,
+      "ce_has_no_opinion(rank tie)": 474
+    },
+    "B_pairwise_accuracy": {
+      "follow_ce": {
+        "all": 0.6249503377036154,
+        "aligned": 1.0,
+        "conflicting": 0.20067739204064353
+      },
+      "invert_ce": {
+        "all": 0.3750496622963846,
+        "aligned": 0.0,
+        "conflicting": 0.7993226079593565
+      },
+      "frozen_aligned_specialist_on_aligned": 0.844311377245509,
+      "frozen_conflicting_specialist_on_conflicting": 0.6646909398814564
+    },
+    "C_routing": {
+      "reported_ceiling(oracle_condition, specialists)": 0.7600317838696862,
+      "trivial_oracle_condition(follow/invert CE)": 0.9058402860548271,
+      "aligned_only_baseline": 0.609455701231625
+    },
+    "D_state_level": {
+      "n_states": 579,
+      "H_gt_0": 81,
+      "H_ge_0.25": 72,
+      "rate_H_gt_0": 0.13989637305699482,
+      "rate_H_ge_0.25": 0.12435233160621761,
+      "mean_H": 0.0930599061047095
+    }
+  },
+  "HotpotQA lockbox": {
+    "A_pair_definition": {
+      "decided_pairs": 3167,
+      "ce_aligned": 1528,
+      "ce_conflicting": 1639,
+      "conflicting_share": 0.5175244711083044,
+      "both_docs_outside_ce_top20": 613,
+      "share_of_conflicting_that_is_both_unranked": 0.3740085417937767,
+      "ce_has_no_opinion(rank tie)": 613
+    },
+    "B_pairwise_accuracy": {
+      "follow_ce": {
+        "all": 0.5792548152826018,
+        "aligned": 1.0,
+        "conflicting": 0.18700427089688834
+      },
+      "invert_ce": {
+        "all": 0.4207451847173982,
+        "aligned": 0.0,
+        "conflicting": 0.8129957291031117
+      },
+      "frozen_aligned_specialist_on_aligned": 0.837696335078534,
+      "frozen_conflicting_specialist_on_conflicting": 0.6918852959121415
+    },
+    "C_routing": {
+      "reported_ceiling(oracle_condition, specialists)": 0.7622355541521945,
+      "trivial_oracle_condition(follow/invert CE)": 0.9032207136090937,
+      "aligned_only_baseline": 0.566782443953268
+    },
+    "D_state_level": {
+      "n_states": 686,
+      "H_gt_0": 129,
+      "H_ge_0.25": 116,
+      "rate_H_gt_0": 0.1880466472303207,
+      "rate_H_ge_0.25": 0.16909620991253643,
+      "mean_H": 0.1331254208547983
+    }
+  },
+  "2WikiMultiHopQA": {
+    "A_pair_definition": {
+      "decided_pairs": 3224,
+      "ce_aligned": 1540,
+      "ce_conflicting": 1684,
+      "conflicting_share": 0.5223325062034739,
+      "both_docs_outside_ce_top20": 600,
+      "share_of_conflicting_that_is_both_unranked": 0.35629453681710216,
+      "ce_has_no_opinion(rank tie)": 600
+    },
+    "B_pairwise_accuracy": {
+      "follow_ce": {
+        "all": 0.5707196029776674,
+        "aligned": 1.0,
+        "conflicting": 0.17814726840855108
+      },
+      "invert_ce": {
+        "all": 0.4292803970223325,
+        "aligned": 0.0,
+        "conflicting": 0.8218527315914489
+      },
+      "frozen_aligned_specialist_on_aligned": 0.7681818181818182,
+      "frozen_conflicting_specialist_on_conflicting": 0.6597387173396675
+    },
+    "C_routing": {
+      "reported_ceiling(oracle_condition, specialists)": 0.7115384615384616,
+      "trivial_oracle_condition(follow/invert CE)": 0.9069478908188585,
+      "aligned_only_baseline": 0.5437344913151365
+    },
+    "D_state_level": {
+      "n_states": 819,
+      "H_gt_0": 164,
+      "H_ge_0.25": 144,
+      "rate_H_gt_0": 0.20024420024420025,
+      "rate_H_ge_0.25": 0.17582417582417584,
+      "mean_H": 0.14409372553772012
+    }
+  },
+  "Qwen2.5-14B": {
+    "A_pair_definition": {
+      "decided_pairs": 4040,
+      "ce_aligned": 2110,
+      "ce_conflicting": 1930,
+      "conflicting_share": 0.4777227722772277,
+      "both_docs_outside_ce_top20": 708,
+      "share_of_conflicting_that_is_both_unranked": 0.36683937823834195,
+      "ce_has_no_opinion(rank tie)": 708
+    },
+    "B_pairwise_accuracy": {
+      "follow_ce": {
+        "all": 0.6099009900990099,
+        "aligned": 1.0,
+        "conflicting": 0.18341968911917098
+      },
+      "invert_ce": {
+        "all": 0.3900990099009901,
+        "aligned": 0.0,
+        "conflicting": 0.816580310880829
+      },
+      "frozen_aligned_specialist_on_aligned": 0.8303317535545024,
+      "frozen_conflicting_specialist_on_conflicting": 0.6668393782383419
+    },
+    "C_routing": {
+      "reported_ceiling(oracle_condition, specialists)": 0.7522277227722772,
+      "trivial_oracle_condition(follow/invert CE)": 0.9123762376237624,
+      "aligned_only_baseline": 0.5972772277227723
+    },
+    "D_state_level": {
+      "n_states": 838,
+      "H_gt_0": 140,
+      "H_ge_0.25": 120,
+      "rate_H_gt_0": 0.16706443914081145,
+      "rate_H_ge_0.25": 0.1431980906921241,
+      "mean_H": 0.11410155079606152
+    }
+  },
+  "MuSiQue": {
+    "A_pair_definition": {
+      "decided_pairs": 3473,
+      "ce_aligned": 1459,
+      "ce_conflicting": 2014,
+      "conflicting_share": 0.5799021019291679,
+      "both_docs_outside_ce_top20": 787,
+      "share_of_conflicting_that_is_both_unranked": 0.39076464746772593,
+      "ce_has_no_opinion(rank tie)": 787
+    },
+    "B_pairwise_accuracy": {
+      "follow_ce": {
+        "all": 0.5334005182839044,
+        "aligned": 1.0,
+        "conflicting": 0.19538232373386297
+      },
+      "invert_ce": {
+        "all": 0.4665994817160956,
+        "aligned": 0.0,
+        "conflicting": 0.804617676266137
+      },
+      "frozen_aligned_specialist_on_aligned": 0.7868403015764222,
+      "frozen_conflicting_specialist_on_conflicting": 0.6658391261171798
+    },
+    "C_routing": {
+      "reported_ceiling(oracle_condition, specialists)": 0.7166714655917075,
+      "trivial_oracle_condition(follow/invert CE)": 0.8866973797869278,
+      "aligned_only_baseline": 0.5249064209617046
+    },
+    "D_state_level": {
+      "n_states": 959,
+      "H_gt_0": 187,
+      "H_ge_0.25": 154,
+      "rate_H_gt_0": 0.19499478623566216,
+      "rate_H_ge_0.25": 0.16058394160583941,
+      "mean_H": 0.10147337274007466
+    }
+  }
+}

@@ -1,0 +1,282 @@
+{
+  "HotpotQA dev": {
+    "n_states": 579,
+    "n_opportunity_states": 174,
+    "families": {
+      "bm25_top": {
+        "n_arms": 579,
+        "mean_utility": 0.034645393196793044,
+        "win_share_ties_split": 0.14666803503010395,
+        "win_share_first_max": 0.3045977011494253
+      },
+      "dense_top": {
+        "n_arms": 579,
+        "mean_utility": 0.07028205285922881,
+        "win_share_ties_split": 0.2573823207443897,
+        "win_share_first_max": 0.3275862068965517
+      },
+      "ce_top": {
+        "n_arms": 579,
+        "mean_utility": 0.062391882487019,
+        "win_share_ties_split": 0.19618910782703888,
+        "win_share_first_max": 0.1781609195402299
+      },
+      "mid_rel": {
+        "n_arms": 579,
+        "mean_utility": 0.01316852590201308,
+        "win_share_ties_split": 0.07751094690749863,
+        "win_share_first_max": 0.07471264367816093
+      },
+      "novelty": {
+        "n_arms": 579,
+        "mean_utility": 0.02552703348410232,
+        "win_share_ties_split": 0.08737684729064037,
+        "win_share_first_max": 0.04597701149425287
+      },
+      "redundancy": {
+        "n_arms": 576,
+        "mean_utility": 0.0301568561087994,
+        "win_share_ties_split": 0.10586343732895456,
+        "win_share_first_max": 0.05172413793103448
+      },
+      "entity_bridge": {
+        "n_arms": 579,
+        "mean_utility": 0.018529379101504328,
+        "win_share_ties_split": 0.068123973727422,
+        "win_share_first_max": 0.017241379310344827
+      },
+      "random": {
+        "n_arms": 579,
+        "mean_utility": 0.014930915580761019,
+        "win_share_ties_split": 0.06088533114395184,
+        "win_share_first_max": 0.0
+      }
+    },
+    "standard_share_ties_split": 0.6002394636015326,
+    "auxiliary_share_ties_split": 0.39976053639846737
+  },
+  "HotpotQA lockbox": {
+    "n_states": 686,
+    "n_opportunity_states": 201,
+    "families": {
+      "bm25_top": {
+        "n_arms": 686,
+        "mean_utility": 0.01803068166041926,
+        "win_share_ties_split": 0.08922056384742949,
+        "win_share_first_max": 0.2537313432835821
+      },
+      "dense_top": {
+        "n_arms": 686,
+        "mean_utility": 0.06381936819254602,
+        "win_share_ties_split": 0.2567638000473822,
+        "win_share_first_max": 0.3333333333333333
+      },
+      "ce_top": {
+        "n_arms": 686,
+        "mean_utility": 0.0652246117989558,
+        "win_share_ties_split": 0.2219260838663824,
+        "win_share_first_max": 0.21890547263681592
+      },
+      "mid_rel": {
+        "n_arms": 686,
+        "mean_utility": 0.01819540432128325,
+        "win_share_ties_split": 0.0712271973466003,
+        "win_share_first_max": 0.029850746268656716
+      },
+      "novelty": {
+        "n_arms": 686,
+        "mean_utility": 0.023914593666780257,
+        "win_share_ties_split": 0.08734896943852163,
+        "win_share_first_max": 0.05970149253731343
+      },
+      "redundancy": {
+        "n_arms": 685,
+        "mean_utility": 0.017221537586501082,
+        "win_share_ties_split": 0.0903814262023217,
+        "win_share_first_max": 0.03980099502487562
+      },
+      "entity_bridge": {
+        "n_arms": 686,
+        "mean_utility": 0.02102112335348487,
+        "win_share_ties_split": 0.09444444444444441,
+        "win_share_first_max": 0.04477611940298507
+      },
+      "random": {
+        "n_arms": 686,
+        "mean_utility": 0.025539040600779585,
+        "win_share_ties_split": 0.08868751480691775,
+        "win_share_first_max": 0.01990049751243781
+      }
+    },
+    "standard_share_ties_split": 0.567910447761194,
+    "auxiliary_share_ties_split": 0.4320895522388058
+  },
+  "2WikiMultiHopQA": {
+    "n_states": 819,
+    "n_opportunity_states": 216,
+    "families": {
+      "bm25_top": {
+        "n_arms": 819,
+        "mean_utility": 0.033980651013618045,
+        "win_share_ties_split": 0.1407572751322751,
+        "win_share_first_max": 0.3101851851851852
+      },
+      "dense_top": {
+        "n_arms": 819,
+        "mean_utility": 0.04593122926456259,
+        "win_share_ties_split": 0.2283013668430336,
+        "win_share_first_max": 0.2824074074074074
+      },
+      "ce_top": {
+        "n_arms": 819,
+        "mean_utility": 0.02336492121280178,
+        "win_share_ties_split": 0.13447420634920632,
+        "win_share_first_max": 0.12962962962962962
+      },
+      "mid_rel": {
+        "n_arms": 819,
+        "mean_utility": 0.020958576086781224,
+        "win_share_ties_split": 0.09859457671957668,
+        "win_share_first_max": 0.06018518518518518
+      },
+      "novelty": {
+        "n_arms": 819,
+        "mean_utility": 0.014550264550264556,
+        "win_share_ties_split": 0.10707120811287475,
+        "win_share_first_max": 0.08333333333333333
+      },
+      "redundancy": {
+        "n_arms": 817,
+        "mean_utility": 0.02474941079592242,
+        "win_share_ties_split": 0.12922729276895936,
+        "win_share_first_max": 0.07407407407407407
+      },
+      "entity_bridge": {
+        "n_arms": 816,
+        "mean_utility": 0.018494278053101585,
+        "win_share_ties_split": 0.08979828042328039,
+        "win_share_first_max": 0.046296296296296294
+      },
+      "random": {
+        "n_arms": 819,
+        "mean_utility": 0.006551812046317546,
+        "win_share_ties_split": 0.07177579365079365,
+        "win_share_first_max": 0.013888888888888888
+      }
+    },
+    "standard_share_ties_split": 0.5035328483245151,
+    "auxiliary_share_ties_split": 0.49646715167548483
+  },
+  "Qwen2.5-14B": {
+    "n_states": 838,
+    "n_opportunity_states": 269,
+    "families": {
+      "bm25_top": {
+        "n_arms": 838,
+        "mean_utility": 0.03536972176590315,
+        "win_share_ties_split": 0.1298415648787396,
+        "win_share_first_max": 0.30111524163568776
+      },
+      "dense_top": {
+        "n_arms": 838,
+        "mean_utility": 0.10214249654443393,
+        "win_share_ties_split": 0.29557886351566665,
+        "win_share_first_max": 0.3828996282527881
+      },
+      "ce_top": {
+        "n_arms": 838,
+        "mean_utility": 0.04723577505060029,
+        "win_share_ties_split": 0.19260488582049926,
+        "win_share_first_max": 0.16728624535315986
+      },
+      "mid_rel": {
+        "n_arms": 838,
+        "mean_utility": 0.017443994304165576,
+        "win_share_ties_split": 0.0746902106567534,
+        "win_share_first_max": 0.03345724907063197
+      },
+      "novelty": {
+        "n_arms": 838,
+        "mean_utility": 0.01887746419895794,
+        "win_share_ties_split": 0.07447778367852717,
+        "win_share_first_max": 0.03717472118959108
+      },
+      "redundancy": {
+        "n_arms": 835,
+        "mean_utility": 0.02373475610530913,
+        "win_share_ties_split": 0.08607275624004244,
+        "win_share_first_max": 0.03717472118959108
+      },
+      "entity_bridge": {
+        "n_arms": 837,
+        "mean_utility": 0.016952888827229954,
+        "win_share_ties_split": 0.062095061072756245,
+        "win_share_first_max": 0.01486988847583643
+      },
+      "random": {
+        "n_arms": 838,
+        "mean_utility": 0.023323561723814425,
+        "win_share_ties_split": 0.08463887413701539,
+        "win_share_first_max": 0.026022304832713755
+      }
+    },
+    "standard_share_ties_split": 0.6180253142149056,
+    "auxiliary_share_ties_split": 0.38197468578509464
+  },
+  "MuSiQue": {
+    "n_states": 959,
+    "n_opportunity_states": 209,
+    "families": {
+      "bm25_top": {
+        "n_arms": 959,
+        "mean_utility": -0.0035853701521973685,
+        "win_share_ties_split": 0.11329460013670539,
+        "win_share_first_max": 0.22488038277511962
+      },
+      "dense_top": {
+        "n_arms": 959,
+        "mean_utility": 0.01322778940341837,
+        "win_share_ties_split": 0.16951469583048526,
+        "win_share_first_max": 0.22488038277511962
+      },
+      "ce_top": {
+        "n_arms": 959,
+        "mean_utility": 0.007853659420320718,
+        "win_share_ties_split": 0.13669400774663934,
+        "win_share_first_max": 0.1339712918660287
+      },
+      "mid_rel": {
+        "n_arms": 959,
+        "mean_utility": 0.007215966248511388,
+        "win_share_ties_split": 0.12449305080884025,
+        "win_share_first_max": 0.11961722488038277
+      },
+      "novelty": {
+        "n_arms": 959,
+        "mean_utility": 0.004910960163526161,
+        "win_share_ties_split": 0.14654818865345176,
+        "win_share_first_max": 0.13875598086124402
+      },
+      "redundancy": {
+        "n_arms": 955,
+        "mean_utility": 0.0030701742347928602,
+        "win_share_ties_split": 0.103485987696514,
+        "win_share_first_max": 0.05263157894736842
+      },
+      "entity_bridge": {
+        "n_arms": 959,
+        "mean_utility": 0.0006610740314711032,
+        "win_share_ties_split": 0.10750740487582588,
+        "win_share_first_max": 0.06220095693779904
+      },
+      "random": {
+        "n_arms": 959,
+        "mean_utility": -0.004774043388637076,
+        "win_share_ties_split": 0.09846206425153795,
+        "win_share_first_max": 0.0430622009569378
+      }
+    },
+    "standard_share_ties_split": 0.41950330371383,
+    "auxiliary_share_ties_split": 0.5804966962861698
+  }
+}

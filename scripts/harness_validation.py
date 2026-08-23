@@ -16,12 +16,12 @@ from piu.agent import AgentRunner, Episode
 from piu.utility import arm_outcome
 
 
-def get_runner(model, retriever, gpu_mem):
+def get_runner(model, retriever, gpu_mem, max_model_len=16384):
     from vllm import LLM
     from transformers import AutoTokenizer
 
     llm = LLM(model=model, gpu_memory_utilization=gpu_mem,
-              max_model_len=16384, seed=42)
+              max_model_len=max_model_len, seed=42)
     tok = AutoTokenizer.from_pretrained(model)
     return AgentRunner(llm, tok, retriever, max_turns=4, docs_per_search=3)
 
@@ -37,6 +37,12 @@ def main():
     ap.add_argument("--model", default="mistralai/Mistral-7B-Instruct-v0.3",
                     help="smoke mode: agent-B model to validate")
     ap.add_argument("--gpu-mem", type=float, default=0.5)
+    ap.add_argument("--n", type=int, default=30,
+                    help="smoke mode: number of questions (preregistered 30)")
+    ap.add_argument("--offset", type=int, default=1700,
+                    help="smoke mode: dev offset (preregistered 1700, untouched)")
+    ap.add_argument("--max-model-len", type=int, default=16384)
+    ap.add_argument("--tag", default="", help="smoke mode: label for the log line")
     args = ap.parse_args()
 
     from piu.retriever import BM25Retriever
@@ -69,8 +75,9 @@ def main():
         print("NOOP_" + ("PASS" if ok else "FAIL"))
 
     else:
-        questions = load_hotpot_dev(n=30, seed=42, offset=1700)
-        runner = get_runner(args.model, retriever, args.gpu_mem)
+        questions = load_hotpot_dev(n=args.n, seed=42, offset=args.offset)
+        runner = get_runner(args.model, retriever, args.gpu_mem,
+                            args.max_model_len)
         eps = [Episode(q["question_id"], q["question"]) for q in questions]
         runner.run(eps)
         n = len(eps)
@@ -104,7 +111,7 @@ def main():
         mean_f1 = sum(arm_outcome(r, q["answer"])["f1"]
                       for r, q in zip(recs, questions)) / n
         print(f"(참고용, 기준 아님) mean F1: {mean_f1:.3f}")
-        print("SMOKE30_" + ("PASS" if ok else "FAIL"))
+        print(f"SMOKE{n}_" + ("PASS" if ok else "FAIL") + (f" [{args.tag}]" if args.tag else ""))
 
 
 if __name__ == "__main__":

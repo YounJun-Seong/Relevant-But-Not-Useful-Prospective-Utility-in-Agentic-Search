@@ -1,0 +1,76 @@
+{
+  "n_states_compared": 20,
+  "n_replicates": 2,
+  "greedy": {
+    "opportunity": {
+      "decisive": 10,
+      "states": 20,
+      "rate": 0.5
+    },
+    "oracle_vs_ce": {
+      "n_questions": 10,
+      "mean": 0.12666666666666668,
+      "ci95": [
+        0.03333333333333334,
+        0.24333333333333332
+      ],
+      "excludes_zero": true
+    }
+  },
+  "sampled_mean_over_replicates": {
+    "opportunity": {
+      "decisive": 7,
+      "states": 20,
+      "rate": 0.35
+    },
+    "oracle_vs_ce": {
+      "n_questions": 10,
+      "mean": 0.17277777777777778,
+      "ci95": [
+        0.06499999999999999,
+        0.29222222222222227
+      ],
+      "excludes_zero": true
+    }
+  },
+  "sampled_per_replicate": {
+    "arm_results_T0.7_r1.jsonl": {
+      "opportunity": {
+        "decisive": 7,
+        "states": 20,
+        "rate": 0.35
+      },
+      "oracle_vs_ce": {
+        "n_questions": 10,
+        "mean": 0.16999999999999998,
+        "ci95": [
+          0.05333333333333333,
+          0.3
+        ],
+        "excludes_zero": true
+      }
+    },
+    "arm_results_T0.7_r2.jsonl": {
+      "opportunity": {
+        "decisive": 5,
+        "states": 20,
+        "rate": 0.25
+      },
+      "oracle_vs_ce": {
+        "n_questions": 10,
+        "mean": 0.17555555555555555,
+        "ci95": [
+          0.05,
+          0.32
+        ],
+        "excludes_zero": true
+      }
+    }
+  },
+  "label_agreement": {
+    "n_greedy_decided_pairs_evaluated": 109,
+    "sign_agreement": 0.44954128440366975,
+    "still_decided_under_sampling": 0.45871559633027525,
+    "sign_agreement_among_still_decided": 0.78
+  }
+}

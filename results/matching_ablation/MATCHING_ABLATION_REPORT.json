@@ -1,0 +1,57 @@
+{
+  "n_interventions_compared": 5487,
+  "specs": {
+    "full (confirmatory)": {
+      "n_questions": 350,
+      "mean": 0.005958198790394169,
+      "ci95": [
+        -0.001662221298775921,
+        0.013654827723630244
+      ]
+    },
+    "neither": {
+      "n_questions": 350,
+      "mean": 0.008611289717907365,
+      "ci95": [
+        0.000628444054389432,
+        0.016692565915254996
+      ]
+    },
+    "no_length": {
+      "n_questions": 350,
+      "mean": 0.008942975548805377,
+      "ci95": [
+        0.0009273667800453488,
+        0.017146692262763694
+      ]
+    },
+    "no_rank_bucket": {
+      "n_questions": 350,
+      "mean": 0.009905987093749695,
+      "ci95": [
+        0.00236733218928597,
+        0.01767838637980445
+      ]
+    }
+  },
+  "matching_quality": {
+    "no_rank_bucket": {
+      "rank_bucket_agreement": 0.11026061600145799,
+      "median_length_ratio": 1.0,
+      "share_length_ratio_within_25pct": 0.9702934208128303,
+      "fallback_rate": 0.0025514853289593585
+    },
+    "no_length": {
+      "rank_bucket_agreement": 0.5935848368871879,
+      "median_length_ratio": 0.8333333333333334,
+      "share_length_ratio_within_25pct": 0.22252597047566977,
+      "fallback_rate": 0.017678148350646985
+    },
+    "neither": {
+      "rank_bucket_agreement": 0.0982321851649353,
+      "median_length_ratio": 0.8375,
+      "share_length_ratio_within_25pct": 0.20612356478950247,
+      "fallback_rate": 0.0007289958082741025
+    }
+  }
+}

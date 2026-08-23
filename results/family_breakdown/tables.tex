@@ -1,0 +1,40 @@
+\begin{table}[h]
+\centering
+\small
+\caption{\textbf{Table S\ref{sec:families}.} Candidate-family contribution on the HotpotQA lockbox (686 states, 201 with a positive opportunity). \emph{Mean $U$} averages realized utility over all arms of the family. \emph{Oracle share} is the fraction of opportunity states at which the family supplies the oracle pick, with ties at the maximum split evenly; the last column applies the pipeline's order-based tie rule instead and is shown only to expose its bias.}
+\label{tab:families}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Family} & \textbf{Mean $U$} & \textbf{Oracle share} & \textbf{(order-based)} \\
+\midrule
+\textbf{bm25\_top} & +0.0180 & 8.9\% & 25.4\% \\
+\textbf{dense\_top} & +0.0638 & 25.7\% & 33.3\% \\
+\textbf{ce\_top} & +0.0652 & 22.2\% & 21.9\% \\
+\textbf{mid\_rel} & +0.0182 & 7.1\% & 3.0\% \\
+\textbf{novelty} & +0.0239 & 8.7\% & 6.0\% \\
+\textbf{redundancy} & +0.0172 & 9.0\% & 4.0\% \\
+\textbf{entity\_bridge} & +0.0210 & 9.4\% & 4.5\% \\
+\textbf{random} & +0.0255 & 8.9\% & 2.0\% \\
+\midrule
+Standard (bm25/dense/ce) & --- & 56.8\% & --- \\
+Auxiliary (other five) & --- & 43.2\% & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\small
+\caption{\textbf{Table S\ref{sec:families}b.} Share of the measured opportunity supplied by standard retrieval candidates versus auxiliary probe families, across all five settings (ties split evenly).}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Setting} & \textbf{Opp.\ states} & \textbf{Standard} & \textbf{Auxiliary} \\
+\midrule
+HotpotQA dev & 174 & 60.0\% & 40.0\% \\
+HotpotQA lockbox & 201 & 56.8\% & 43.2\% \\
+2WikiMultiHopQA & 216 & 50.4\% & 49.6\% \\
+Qwen2.5-14B & 269 & 61.8\% & 38.2\% \\
+MuSiQue & 209 & 42.0\% & 58.0\% \\
+\bottomrule
+\end{tabular}
+\end{table}

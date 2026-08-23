@@ -1,0 +1,44 @@
+{
+  "model": "microsoft/deberta-v3-base",
+  "epochs": 4,
+  "lr": 1e-05,
+  "train_states": 2368,
+  "train_prevalence": 0.1777871549129486,
+  "settings": {
+    "HotpotQA dev": {
+      "n_states": 579,
+      "prevalence": 0.13989637305699482,
+      "auc": 0.47782487976597743,
+      "average_precision": 0.13617227663093479,
+      "ap_over_prevalence": 0.9733796070285339
+    },
+    "HotpotQA lockbox": {
+      "n_states": 686,
+      "prevalence": 0.1880466472303207,
+      "auc": 0.5246197096850514,
+      "average_precision": 0.20712700084265334,
+      "ap_over_prevalence": 1.1014660664965907
+    },
+    "2WikiMultiHopQA": {
+      "n_states": 819,
+      "prevalence": 0.20024420024420025,
+      "auc": 0.5669195680506424,
+      "average_precision": 0.2603418630648244,
+      "ap_over_prevalence": 1.3001218649395803
+    },
+    "Qwen2.5-14B": {
+      "n_states": 838,
+      "prevalence": 0.16706443914081145,
+      "auc": 0.48327875562832584,
+      "average_precision": 0.16767505380859538,
+      "ap_over_prevalence": 1.0036549649400208
+    },
+    "MuSiQue": {
+      "n_states": 959,
+      "prevalence": 0.19499478623566216,
+      "auc": 0.5912969992518912,
+      "average_precision": 0.24123221731470468,
+      "ap_over_prevalence": 1.2371213711486726
+    }
+  }
+}

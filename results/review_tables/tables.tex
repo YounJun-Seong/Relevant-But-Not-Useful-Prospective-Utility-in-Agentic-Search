@@ -1,0 +1,467 @@
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Relevance baselines do not close the measured headroom.}
+Oracle$-$selector difference in downstream answer F1 (question-level
+paired bootstrap). \emph{CE} is the confirmatory baseline
+(ms-marco-MiniLM-L6-v2 on $q_t$); \emph{BGE} is bge-reranker-v2-m3
+(568M) scored either on $q_t$ or on a state-aware query
+($q_0$ + $q_t$ + consumed titles); \emph{LLM} is Qwen2.5-7B listwise
+ranking given the same state. Random is a within-state reference.}
+\label{tab:relbaselines}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Setting} & \textbf{Random} & \textbf{CE} & \textbf{BGE $q_t$} & \textbf{BGE state} & \textbf{LLM state} \\
+\midrule
+HotpotQA dev & +0.153 & +0.082 & +0.099 & +0.087 & +0.095 \\
+HotpotQA lockbox & +0.157 & +0.117 & +0.118 & +0.116 & +0.133 \\
+2Wiki & +0.172 & +0.142 & +0.135 & +0.136 & +0.141 \\
+Qwen2.5-14B & +0.161 & +0.097 & +0.096 & +0.090 & +0.100 \\
+MuSiQue & +0.121 & +0.097 & +0.099 & +0.104 & +0.105 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{The conditional signatures are not distinguishable from
+a conditioning-only null.} Coefficients refit inside the CE-conflicting
+subset, against a null that permutes measured outcomes among the
+candidates of a state while holding CE scores and features fixed. The
+null preserves the conditioning structure but destroys any true
+feature--utility relation.}
+\label{tab:nullshuffle}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{\textbf{query\_align}} & \multicolumn{2}{c}{\textbf{doc\_len}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Setting} & \textbf{Refit} & \textbf{Null 95\% CI} & \textbf{Refit} & \textbf{Null 95\% CI} \\
+\midrule
+HotpotQA dev & -4.93 & [-5.70, -3.49] & -3.30 & [-5.30, -2.61] \\
+HotpotQA lockbox & -5.49 & [-6.00, -4.15] & -4.36 & [-5.93, -3.45] \\
+2Wiki & -3.32 & [-5.21, -3.54] & -5.13 & [-5.60, -3.07] \\
+Qwen2.5-14B & -5.25 & [-5.75, -4.10] & -3.97 & [-5.93, -3.47] \\
+MuSiQue & -4.80 & [-5.99, -4.19] & -3.67 & [-5.67, -3.13] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{The headroom is not a maximum taken over noise.}
+Both panels use the same 137 audited lockbox states, three rollouts each.
+\emph{Split} selects the candidate on one rollout and evaluates it on the
+held-out rollouts. \emph{Matched-noise null} gives every candidate in a
+state the same expected outcome and perturbs it with the observed
+within-candidate rollout deviations.}
+\label{tab:placebo}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Policy} & \textbf{Same-rollout} & \textbf{Split} & \textbf{Matched-noise null} \\
+\midrule
+Greedy ($T{=}0$, as reported) & +0.136 & +0.130 & +0.002 \\
+Sampled ($T{=}0.7$) & +0.112 & +0.033 & +0.072 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{The headroom is not produced by failure enrichment.}
+Oracle$-$CE by preregistered sampling stratum; the representative stratum
+is an unenriched sample of the benchmark.}
+\label{tab:stratum}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Setting} & \textbf{Pooled} & \textbf{Representative} & \textbf{Failure-enriched} \\
+\midrule
+HotpotQA dev & +0.082 [+0.062, +0.104] & +0.062 [+0.035, +0.092] & +0.103 [+0.073, +0.134] \\
+HotpotQA lockbox & +0.117 [+0.092, +0.142] & +0.119 [+0.085, +0.156] & +0.115 [+0.082, +0.150] \\
+2Wiki & +0.142 [+0.117, +0.168] & +0.159 [+0.123, +0.197] & +0.126 [+0.092, +0.162] \\
+Qwen2.5-14B & +0.097 [+0.076, +0.120] & +0.087 [+0.058, +0.119] & +0.108 [+0.077, +0.142] \\
+MuSiQue & +0.097 [+0.080, +0.116] & +0.096 [+0.073, +0.121] & +0.098 [+0.071, +0.128] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Relevance selection is informative, and the headroom
+survives stronger and state-aware selectors.} Absolute downstream F1 of
+each selector and the Oracle$-$selector headroom, question-level paired
+bootstrap. \emph{Random} is the exact expectation of a uniform pick over
+the candidate set. CE is ms-marco-MiniLM-L6-v2 on $q_t$; BGE is
+bge-reranker-v2-m3 scored on $q_t$ or on a state-aware query.}
+\label{tab:selectors}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Setting} & \textbf{Selector} & \textbf{F1} & \textbf{Oracle$-$selector} \\
+\midrule
+HotpotQA dev & Random & 0.408 & +0.154 [+0.130, +0.180] \\
+ & CE (MiniLM, $q_t$) & 0.480 & +0.082 [+0.062, +0.104] \\
+ & BGE ($q_t$) & 0.464 & +0.099 [+0.075, +0.124] \\
+ & BGE (state-aware) & 0.475 & +0.087 [+0.065, +0.111] \\
+ & Oracle & 0.562 & --- \\
+\multicolumn{2}{r}{\emph{CE$-$Random (paired)}} & \multicolumn{2}{l}{+0.072 [+0.051, +0.094]} \\
+\midrule
+HotpotQA lockbox & Random & 0.401 & +0.155 [+0.131, +0.178] \\
+ & CE (MiniLM, $q_t$) & 0.439 & +0.117 [+0.092, +0.142] \\
+ & BGE ($q_t$) & 0.438 & +0.118 [+0.094, +0.144] \\
+ & BGE (state-aware) & 0.440 & +0.116 [+0.091, +0.141] \\
+ & Oracle & 0.556 & --- \\
+\multicolumn{2}{r}{\emph{CE$-$Random (paired)}} & \multicolumn{2}{l}{+0.038 [+0.019, +0.057]} \\
+\midrule
+2Wiki & Random & 0.254 & +0.166 [+0.143, +0.188] \\
+ & CE (MiniLM, $q_t$) & 0.277 & +0.142 [+0.117, +0.168] \\
+ & BGE ($q_t$) & 0.285 & +0.135 [+0.111, +0.160] \\
+ & BGE (state-aware) & 0.283 & +0.136 [+0.112, +0.163] \\
+ & Oracle & 0.420 & --- \\
+\multicolumn{2}{r}{\emph{CE$-$Random (paired)}} & \multicolumn{2}{l}{+0.023 [+0.007, +0.040]} \\
+\midrule
+Qwen2.5-14B & Random & 0.483 & +0.154 [+0.130, +0.177] \\
+ & CE (MiniLM, $q_t$) & 0.540 & +0.097 [+0.076, +0.120] \\
+ & BGE ($q_t$) & 0.541 & +0.096 [+0.075, +0.119] \\
+ & BGE (state-aware) & 0.547 & +0.090 [+0.071, +0.110] \\
+ & Oracle & 0.637 & --- \\
+\multicolumn{2}{r}{\emph{CE$-$Random (paired)}} & \multicolumn{2}{l}{+0.057 [+0.037, +0.077]} \\
+\midrule
+MuSiQue & Random & 0.143 & +0.120 [+0.103, +0.139] \\
+ & CE (MiniLM, $q_t$) & 0.166 & +0.097 [+0.080, +0.116] \\
+ & BGE ($q_t$) & 0.164 & +0.099 [+0.081, +0.118] \\
+ & BGE (state-aware) & 0.159 & +0.104 [+0.085, +0.125] \\
+ & Oracle & 0.263 & --- \\
+\multicolumn{2}{r}{\emph{CE$-$Random (paired)}} & \multicolumn{2}{l}{+0.023 [+0.010, +0.037]} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{States containing prospective headroom are hard to
+identify before intervention.} AUC of the state-level gate by feature
+set, with prevalence-adjusted metrics for the full gate. AUC is
+insensitive to prevalence; average precision has the prevalence itself
+as its random baseline, so AP/prevalence is the achieved lift.}
+\label{tab:gate}
+\begin{tabular}{lccccc}
+\toprule
+& & \multicolumn{3}{c}{\textbf{AUC}} & \\
+\cmidrule(lr){3-5}
+\textbf{Setting} & \textbf{Prev.} & \textbf{CE stats} & \textbf{$\varphi$ agg.} & \textbf{Full} & \textbf{AP/prev.} \\
+\midrule
+HotpotQA dev & 0.140 & 0.547 & 0.578 & 0.599 & 1.26 \\
+HotpotQA lockbox & 0.188 & 0.494 & 0.547 & 0.637 & 1.49 \\
+2Wiki & 0.200 & 0.541 & 0.538 & 0.527 & 1.20 \\
+Qwen2.5-14B & 0.167 & 0.535 & 0.568 & 0.560 & 1.24 \\
+MuSiQue & 0.195 & 0.524 & 0.502 & 0.505 & 1.07 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{The stronger selectors are genuinely stronger relevance
+models, yet this does not transfer downstream.} Gold hit@1 and nDCG@10
+over the full candidate pool $\mathcal{C}_t$ (about 110 unseen documents
+per state), scored against the datasets' annotated supporting documents;
+states whose pool contains no annotated document are excluded and
+reported as coverage. The last column is the paired selector$-$CE
+difference in hit@1 with question-level 95\% bootstrap intervals.}
+\label{tab:relquality}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Setting} & \textbf{Selector} & \textbf{hit@1} & \textbf{nDCG@10} & \textbf{$\Delta$hit@1 vs.\ CE} \\
+\midrule
+HotpotQA dev (69\%) & Random & 0.009 & 0.044 & -0.399 [-0.457, -0.343] \\
+ & CE (MiniLM, $q_t$) & 0.408 & 0.458 & --- \\
+ & BGE ($q_t$) & 0.490 & 0.560 & +0.082 [+0.038, +0.128] \\
+ & BGE (state-aware) & 0.776 & 0.842 & +0.368 [+0.298, +0.438] \\
+\midrule
+HotpotQA lockbox (67\%) & Random & 0.005 & 0.033 & -0.315 [-0.365, -0.265] \\
+ & CE (MiniLM, $q_t$) & 0.320 & 0.387 & --- \\
+ & BGE ($q_t$) & 0.422 & 0.508 & +0.102 [+0.059, +0.147] \\
+ & BGE (state-aware) & 0.765 & 0.840 & +0.445 [+0.379, +0.511] \\
+\midrule
+2Wiki (56\%) & Random & 0.009 & 0.061 & -0.278 [-0.326, -0.232] \\
+ & CE (MiniLM, $q_t$) & 0.287 & 0.362 & --- \\
+ & BGE ($q_t$) & 0.320 & 0.387 & +0.033 [+0.001, +0.064] \\
+ & BGE (state-aware) & 0.674 & 0.735 & +0.387 [+0.313, +0.457] \\
+\midrule
+Qwen2.5-14B (69\%) & Random & 0.011 & 0.052 & -0.408 [-0.461, -0.356] \\
+ & CE (MiniLM, $q_t$) & 0.420 & 0.481 & --- \\
+ & BGE ($q_t$) & 0.516 & 0.594 & +0.096 [+0.051, +0.141] \\
+ & BGE (state-aware) & 0.723 & 0.813 & +0.304 [+0.235, +0.371] \\
+\midrule
+MuSiQue (57\%) & Random & 0.008 & 0.029 & -0.238 [-0.285, -0.192] \\
+ & CE (MiniLM, $q_t$) & 0.246 & 0.364 & --- \\
+ & BGE ($q_t$) & 0.292 & 0.418 & +0.046 [+0.012, +0.081] \\
+ & BGE (state-aware) & 0.444 & 0.579 & +0.198 [+0.135, +0.261] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{No gate family identifies headroom states well.}
+ROC-AUC for the state-level label $Z(s_t)$. The learned gates are
+fine-tuned encoders trained on the same 2{,}368 training-split states;
+\emph{Best} takes the most favourable family per setting, chosen post
+hoc, and is therefore an optimistic bound.}
+\label{tab:allgates}
+\begin{tabular}{lcccccc}
+\toprule
+\textbf{Setting} & \textbf{Prev.} & \textbf{CE stats} & \textbf{$\varphi$ agg.} & \textbf{Full feat.} & \textbf{Transformer} & \textbf{Best} \\
+\midrule
+HotpotQA dev & 0.140 & 0.547 & 0.578 & 0.599 & 0.516 & 0.599 \\
+HotpotQA lockbox & 0.188 & 0.494 & 0.547 & 0.637 & 0.525 & 0.637 \\
+2Wiki & 0.200 & 0.541 & 0.538 & 0.527 & 0.567 & 0.567 \\
+Qwen2.5-14B & 0.167 & 0.535 & 0.568 & 0.560 & 0.511 & 0.568 \\
+MuSiQue & 0.195 & 0.524 & 0.502 & 0.505 & 0.591 & 0.591 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Two distinct positive-state rates.}
+\emph{Opp-base} counts states where some candidate beats the
+pre-intervention trajectory; \emph{Opp-CE} counts states where some
+candidate beats the CE-selected candidate, which is the state-level
+label $Z(s_t)$ used for prospective identification. They are different
+quantities and are never interchangeable.}
+\label{tab:oppdefs}
+\begin{tabular}{lcccc}
+\toprule
+& \multicolumn{2}{c}{\textbf{Opp-base}} & \multicolumn{2}{c}{\textbf{Opp-CE}} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Setting} & \textbf{$>0$} & \textbf{$\ge$0.25} & \textbf{$>0$} & \textbf{$\ge$0.25} \\
+\midrule
+HotpotQA dev & 30.1\% & 26.4\% & 14.0\% & 12.4\% \\
+HotpotQA lockbox & 29.3\% & 27.8\% & 18.8\% & 16.9\% \\
+2Wiki & 26.4\% & 24.8\% & 20.0\% & 17.6\% \\
+Qwen2.5-14B & 32.1\% & 29.1\% & 16.7\% & 14.3\% \\
+MuSiQue & 21.8\% & 18.8\% & 19.5\% & 16.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{The headroom is concentrated where the intervention
+changes subsequent search.} States are split by what the two compared
+arms ($d_{\mathrm{PIU}}$ and $d_{\mathrm{CE}}$) do after the
+intervention. \emph{No search}: neither issues a further search.
+\emph{Any search}: at least one does. \emph{Query changed}: at least one
+searches and the first post-intervention query differs between the arms.
+Oracle$-$CE with question-level 95\% paired-bootstrap intervals.}
+\label{tab:w1}
+\begin{tabular}{llcc}
+\toprule
+\textbf{Setting} & \textbf{Subset} & \textbf{States} & \textbf{Oracle$-$CE} \\
+\midrule
+HotpotQA dev & No further search & 323 & +0.051 [+0.031, +0.072] \\
+ & All states & 579 & +0.082 [+0.062, +0.104] \\
+ & Any further search & 256 & +0.133 [+0.095, +0.175] \\
+ & Query changed & 147 & +0.177 [+0.122, +0.237] \\
+\midrule
+HotpotQA lockbox & No further search & 366 & +0.079 [+0.054, +0.106] \\
+ & All states & 686 & +0.117 [+0.092, +0.142] \\
+ & Any further search & 320 & +0.169 [+0.130, +0.211] \\
+ & Query changed & 175 & +0.311 [+0.244, +0.380] \\
+\midrule
+2Wiki & No further search & 353 & +0.085 [+0.058, +0.114] \\
+ & All states & 819 & +0.142 [+0.117, +0.168] \\
+ & Any further search & 466 & +0.190 [+0.154, +0.229] \\
+ & Query changed & 198 & +0.274 [+0.213, +0.339] \\
+\midrule
+Qwen2.5-14B & No further search & 371 & +0.050 [+0.029, +0.072] \\
+ & All states & 838 & +0.097 [+0.076, +0.120] \\
+ & Any further search & 467 & +0.143 [+0.112, +0.177] \\
+ & Query changed & 284 & +0.223 [+0.177, +0.273] \\
+\midrule
+MuSiQue & No further search & 330 & +0.086 [+0.061, +0.113] \\
+ & All states & 959 & +0.097 [+0.080, +0.116] \\
+ & Any further search & 629 & +0.111 [+0.089, +0.134] \\
+ & Query changed & 405 & +0.131 [+0.100, +0.163] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Controlled PIU for the candidate each rule selects.}
+$Y(s_t,E_{<t}\cup\{d\})-Y(s_t,E_{<t}\cup\{\tilde d\})$ against the
+candidate's own matched control. Averaging over all candidates (the
+\emph{Random} row) is near zero by construction; the selected-candidate
+rows are informative. The oracle row is chosen on the raw outcome and
+scored on the controlled one, so the random and anti-oracle rows bound
+its selection effect.}
+\label{tab:w6}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Setting} & \textbf{Anti-oracle} & \textbf{Random} & \textbf{CE} & \textbf{Oracle} \\
+\midrule
+HotpotQA dev & -0.092 & +0.011 & +0.085 & +0.160 \\
+HotpotQA lockbox & -0.100 & -0.003 & +0.044 & +0.152 \\
+2Wiki & -0.102 & +0.011 & +0.025 & +0.164 \\
+Qwen2.5-14B & -0.085 & +0.021 & +0.066 & +0.162 \\
+MuSiQue & -0.072 & +0.001 & +0.030 & +0.113 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{A budgeted lookahead concentrates most of the
+headroom, but cheap gold-free scoring does not exploit it.}
+Rolling out the CE top-$k$ candidates: \emph{Oracle-$k$} keeps the best
+measured outcome (an upper bound; it needs a scored outcome),
+\emph{Vote} answers by majority over the $k$ continuations and uses no
+gold. \emph{Recovered} is the fraction of the full 8-candidate headroom.
+The last column reports how often the useful candidate's answer is the
+modal answer across the candidate set, on opportunity states.}
+\label{tab:lookahead}
+\begin{tabular}{lccccc}
+\toprule
+& \multicolumn{2}{c}{\textbf{Oracle-$k$ recovered}} & \multicolumn{2}{c}{\textbf{Vote F1}} & \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+\textbf{Setting} & $k{=}2$ & $k{=}3$ & $k{=}1$ (CE) & $k{=}3$ & \textbf{Oracle modal} \\
+\midrule
+HotpotQA dev & 31\% & 64\% & 0.480 & 0.452 & 25\% \\
+HotpotQA lockbox & 46\% & 65\% & 0.439 & 0.433 & 29\% \\
+2Wiki & 37\% & 61\% & 0.277 & 0.273 & 24\% \\
+Qwen2.5-14B & 46\% & 71\% & 0.540 & 0.520 & 24\% \\
+MuSiQue & 32\% & 54\% & 0.166 & 0.156 & 22\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{A conservative continuation scorer converts lookahead
+into small but significant end-to-end gains.} The scorer sees only
+observable, gold-free signals of the CE top-3 continuations and
+overrides the CE choice only when its score margin exceeds a threshold
+tuned once on the development setting. \emph{Pairwise acc.} is its
+accuracy on decided continuation pairs; \emph{Oracle@3} bounds what any
+selector could achieve at this budget.}
+\label{tab:scorer}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Setting} & \textbf{Overrides} & \textbf{Gain vs.\ CE} & \textbf{Oracle@3} & \textbf{Pairwise acc.} \\
+\midrule
+HotpotQA dev & 12/579 & +0.0011 [-0.0032, +0.0053] & +0.052 & 0.695 \\
+HotpotQA lockbox & 13/686 & +0.0035 [+0.0007, +0.0071] & +0.076 & 0.631 \\
+2Wiki & 39/819 & +0.0075 [+0.0017, +0.0143] & +0.086 & 0.595 \\
+Qwen2.5-14B & 49/838 & +0.0096 [+0.0025, +0.0172] & +0.069 & 0.754 \\
+MuSiQue & 58/959 & +0.0004 [-0.0036, +0.0045] & +0.053 & 0.544 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Utility winners are near the top of the relevance
+ranking.} On states with CE-relative headroom, the CE rank of the
+oracle-winning candidate within $\mathcal{D}_t$ (rank 1 is impossible
+by definition), and the share of failure states whose winner is
+already in the CE top-2 / top-3.}
+\label{tab:winnerrank}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Setting} & \textbf{States} & \textbf{Median rank} & \textbf{Top-2} & \textbf{Top-3} & \textbf{Rank 5+} \\
+\midrule
+HotpotQA dev & 81 & 4 & 17.3\% & 38.3\% & 34/81 \\
+HotpotQA lockbox & 129 & 3 & 33.3\% & 50.4\% & 42/129 \\
+2Wiki & 164 & 4 & 23.8\% & 47.0\% & 58/164 \\
+Qwen2.5-14B & 140 & 4 & 30.7\% & 45.7\% & 54/140 \\
+MuSiQue & 187 & 4 & 17.1\% & 35.3\% & 84/187 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Null-controlled characterisation of utility winners.}
+Paired feature difference $\varphi(d_{\mathrm{PIU}})-\varphi(d_{\mathrm{CE}})$
+on failure states, against a within-state outcome-permutation null that
+preserves the mechanical part of the contrast (the winner is never the
+CE argmax). A cell is a finding only when the real value falls outside
+the null band; $\uparrow$/$\downarrow$ marks the direction relative to
+the null, and --- marks cells inside it.}
+\label{tab:winnerchar}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Setting} & \textbf{query\_align} & \textbf{q0\_align} & \textbf{doc\_len} & \textbf{redundancy} & \textbf{novelty} \\
+\midrule
+HotpotQA dev & $\uparrow$ -0.136 & $\uparrow$ -0.077 & $\uparrow$ -0.074 & $\downarrow$ -0.004 & --- \\
+HotpotQA lockbox & $\uparrow$ -0.131 & $\uparrow$ -0.064 & $\uparrow$ -0.057 & $\downarrow$ -0.005 & $\uparrow$ -0.019 \\
+2Wiki & $\uparrow$ -0.078 & --- & $\uparrow$ -0.054 & --- & --- \\
+Qwen2.5-14B & $\uparrow$ -0.120 & $\uparrow$ -0.075 & $\uparrow$ -0.039 & --- & --- \\
+MuSiQue & --- & --- & $\uparrow$ -0.058 & $\downarrow$ +0.012 & $\uparrow$ -0.036 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{The relevance advantage is present on the exact
+downstream choice space.} \emph{Retained}: fraction of states whose
+full-pool argmax is contained in the retained intervention set
+$\mathcal{D}_t$ (guaranteed for CE by construction). \emph{Hit@1}:
+supporting-document hit@1 over $\mathcal{D}_t$ on states whose retained
+set contains an annotated document, with the paired BGE-state$-$CE
+difference.}
+\label{tab:choicespace}
+\begin{tabular}{lcccccc}
+\toprule
+& \multicolumn{2}{c}{\textbf{Retained}} & \multicolumn{3}{c}{\textbf{Hit@1 over $\mathcal{D}_t$}} & \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-6}
+\textbf{Setting} & \textbf{BGE} & \textbf{BGE-St} & \textbf{CE} & \textbf{BGE} & \textbf{BGE-St} & \textbf{$\Delta$(BGE-St$-$CE)} \\
+\midrule
+HotpotQA dev & 0.67 & 0.37 & 0.753 & 0.846 & 0.900 & +0.147 [+0.074, +0.223] \\
+HotpotQA lockbox & 0.65 & 0.32 & 0.719 & 0.801 & 0.903 & +0.184 [+0.100, +0.268] \\
+2Wiki & 0.58 & 0.25 & 0.707 & 0.796 & 0.790 & +0.082 [+0.007, +0.158] \\
+Qwen2.5-14B & 0.71 & 0.37 & 0.749 & 0.819 & 0.852 & +0.103 [+0.038, +0.172] \\
+MuSiQue & 0.60 & 0.26 & 0.555 & 0.671 & 0.685 & +0.130 [+0.044, +0.216] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\small
+\caption{\textbf{Granting the stronger selectors their genuine
+full-pool choice does not close the gap.} Each selector's full-pool
+argmax was injected and rolled out under the frozen greedy policy
+wherever it was not already retained (3{,}861 new arms; post-hoc
+exploratory). All rows share the identical state set; the expanded
+oracle maximises over $\mathcal{D}_t$ plus the new arms.}
+\label{tab:expanded}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Setting} & \textbf{BGE$-$CE} & \textbf{BGE-St$-$CE} & \textbf{Oracle($\mathcal{D}_t$)$-$CE} & \textbf{Oracle(exp.)$-$CE} \\
+\midrule
+HotpotQA dev & -0.019 [-0.042, +0.004] & +0.012 [-0.016, +0.043] & +0.082 & +0.125 \\
+HotpotQA lockbox & +0.008 [-0.010, +0.026] & +0.024 [-0.003, +0.051] & +0.117 & +0.151 \\
+2Wiki & +0.010 [-0.006, +0.025] & +0.018 [-0.007, +0.043] & +0.142 & +0.168 \\
+Qwen2.5-14B & -0.010 [-0.029, +0.010] & -0.009 [-0.034, +0.016] & +0.097 & +0.136 \\
+MuSiQue & -0.001 [-0.014, +0.012] & -0.000 [-0.017, +0.017] & +0.097 & +0.111 \\
+\bottomrule
+\end{tabular}
+\end{table}

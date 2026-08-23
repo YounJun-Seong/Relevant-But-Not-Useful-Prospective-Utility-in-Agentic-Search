@@ -1,0 +1,94 @@
+{
+  "greedy_replays": {
+    "tag": "greedy (3 replays, T=0)",
+    "n_states": 137,
+    "observed_select_and_eval_same": {
+      "mean": 0.13568202348690153,
+      "ci95": [
+        0.08419150858175249,
+        0.18970189701897017
+      ],
+      "n_questions": 123
+    },
+    "split_select_r1": {
+      "mean": 0.13432700993676605,
+      "ci95": [
+        0.08310749774164408,
+        0.1879855465221319
+      ],
+      "n_questions": 123
+    },
+    "split_select_r2": {
+      "mean": 0.12845528455284552,
+      "ci95": [
+        0.07890695573622401,
+        0.18080397470641374
+      ],
+      "n_questions": 123
+    },
+    "split_select_r3": {
+      "mean": 0.12845528455284552,
+      "ci95": [
+        0.07890695573622401,
+        0.18080397470641374
+      ],
+      "n_questions": 123
+    },
+    "split_mean_over_folds": 0.13041252634748568,
+    "matched_noise_null": {
+      "null_mean": 0.0024431898022683933,
+      "null_ci95": [
+        0.0004516711833785008,
+        0.005170380407507777
+      ],
+      "p_null_ge_observed": 0.0
+    },
+    "mean_within_candidate_sd": 0.0012664456408112723
+  },
+  "sampled_same_states": {
+    "tag": "sampled T=0.7 (3 replicates)",
+    "n_states": 137,
+    "observed_select_and_eval_same": {
+      "mean": 0.11161010022798643,
+      "ci95": [
+        0.07446122080268422,
+        0.15316169828364948
+      ],
+      "n_questions": 123
+    },
+    "split_select_r1": {
+      "mean": 0.03000982757080318,
+      "ci95": [
+        -0.006186158015426311,
+        0.06868950832365467
+      ],
+      "n_questions": 123
+    },
+    "split_select_r2": {
+      "mean": 0.030878177829397342,
+      "ci95": [
+        -0.009288295263905023,
+        0.07439024390243902
+      ],
+      "n_questions": 123
+    },
+    "split_select_r3": {
+      "mean": 0.036878952122854566,
+      "ci95": [
+        0.0033423667570009023,
+        0.07344173441734417
+      ],
+      "n_questions": 123
+    },
+    "split_mean_over_folds": 0.03258898584101836,
+    "matched_noise_null": {
+      "null_mean": 0.07248229148398525,
+      "null_ci95": [
+        0.05746961077415006,
+        0.08826447691623843
+      ],
+      "p_null_ge_observed": 0.0
+    },
+    "mean_within_candidate_sd": 0.0648187446545386
+  }
+}

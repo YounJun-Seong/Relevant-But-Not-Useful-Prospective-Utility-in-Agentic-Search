@@ -219,5 +219,72 @@ def fig4():
     save(fig, "fig4_replication")
 
 
-fig1(); fig2(); fig3(); fig4()
-print("ALL_FIGS_DONE")
+if __name__ == "__main__" and "--v2only" not in __import__("sys").argv:
+    fig1(); fig2(); fig3(); fig4()
+    print("ALL_FIGS_DONE")
+
+
+# ============ F3 v2: identifiability — (a) ROC + (b) routing ============
+def fig3_v2():
+    import json
+    G = json.load(open("results/lockbox/gate_scores.json"))
+    fig, (ax, ax2) = plt.subplots(
+        1, 2, figsize=(COL_W, 1.9), width_ratios=[1, 1.12],
+        constrained_layout=True)
+    # (a) ROC
+    ax.plot([0, 1], [0, 1], color=INK3, lw=0.7, ls=(0, (2, 2)), zorder=1)
+    curves = [("gbm", "Feature gate", BLUE_L, 0.9),
+              ("transformer", "Transformer gate", "#5b9be0", 0.9),
+              ("ens", "Frozen ensemble", BLUE, 1.3)]
+    aucs = G["auc"]
+    for key, label, c, lw in curves:
+        r = G[f"roc_{key}"]
+        a = aucs["ensemble" if key == "ens" else key]
+        ax.plot(r["fpr"], r["tpr"], color=c, lw=lw, zorder=3,
+                label=f"{label}  {a:.2f}")
+    ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax.set_xticks([0, 0.5, 1]); ax.set_yticks([0, 0.5, 1])
+    ax.set_xlabel("False positive rate", fontsize=6.6, labelpad=1.5)
+    ax.set_ylabel("True positive rate", fontsize=6.6, labelpad=1.5)
+    ax.tick_params(labelsize=6.0, length=2)
+    ax.set_aspect("equal")
+    ax.legend(loc="lower right", fontsize=5.5, frameon=True, framealpha=0.92,
+              edgecolor="none", handlelength=1.4, borderaxespad=0.15,
+              labelspacing=0.25, title="AUC", title_fontsize=5.5)
+    ax.text(0.04, 0.965, "Richer gates improve\ndiscrimination only modestly",
+            fontsize=5.7, color=INK2, va="top", linespacing=1.25,
+            bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none",
+                      alpha=0.85))
+    ax.set_title("(a) Detecting CE-conflicting\npairs on the lockbox",
+                 fontsize=6.8, pad=3)
+    despine(ax, keep=("bottom", "left"))
+    # (b) routing bars
+    labels = ["Oracle-\ncondition\nrouting", "Deployable\ngate (best\nmixture)",
+              "CE-aligned\nexpert\nonly"]
+    vals = [76.2, 56.3, 56.7]
+    cols = [BLUE, ORANGE, "#6f6e6a"]
+    x = np.arange(3)
+    ax2.bar(x, vals, width=0.56, color=cols, zorder=2)
+    for xi, v in zip(x, vals):
+        ax2.annotate(f"{v:.1f}", (xi, v + 0.8), ha="center", va="bottom",
+                     fontsize=6.5, color=INK, fontweight="bold")
+    ax2.axhline(50, color=INK2, lw=0.7, ls=(0, (3, 2.2)), zorder=1)
+    ax2.annotate("chance", (-0.42, 50.7), fontsize=5.5, color=INK2, ha="left")
+    ax2.annotate("", xy=(0.5, 76.2), xytext=(0.5, 56.3),
+                 arrowprops=dict(arrowstyle="<->", color=INK, lw=0.8,
+                                 shrinkA=0, shrinkB=0))
+    ax2.text(0.58, 66.3, "identifiability\ngap", fontsize=5.7, color=INK,
+             va="center", linespacing=1.2)
+    ax2.set_xticks(x, labels, fontsize=5.7)
+    ax2.set_ylim(44, 84); ax2.set_yticks([50, 60, 70, 80])
+    ax2.tick_params(axis="x", length=0, pad=2)
+    ax2.tick_params(axis="y", labelsize=6.0)
+    ax2.set_ylabel("Pairwise accuracy (%)", fontsize=6.6, labelpad=1.5)
+    ax2.set_title("(b) Routing outcome\n(recovery \u2248 \u22120.02)", fontsize=6.8,
+                  pad=3)
+    despine(ax2, keep=("bottom", "left"))
+    save(fig, "fig3_identifiability_v2")
+
+
+if __name__ == "__main__" and "--v2only" in __import__("sys").argv:
+    fig3_v2()

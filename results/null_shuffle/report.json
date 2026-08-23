@@ -1,0 +1,217 @@
+{
+  "HotpotQA dev": {
+    "n_conflicting_pairs_real": 941,
+    "n_conflicting_pairs_null_mean": 1257.9666666666667,
+    "n_permutations": 300,
+    "features": {
+      "query_align": {
+        "real_coef": -4.934869289398193,
+        "null_mean": -4.445924282073975,
+        "null_ci95": [
+          -5.700963973999023,
+          -3.49191951751709
+        ],
+        "pct_null_at_least_as_extreme": 0.16333333333333333
+      },
+      "doc_len": {
+        "real_coef": -3.2984259128570557,
+        "null_mean": -3.9352176189422607,
+        "null_ci95": [
+          -5.298352241516113,
+          -2.605743646621704
+        ],
+        "pct_null_at_least_as_extreme": 0.8
+      },
+      "redundancy": {
+        "real_coef": -1.9999580383300781,
+        "null_mean": -0.18012076616287231,
+        "null_ci95": [
+          -1.8025588989257812,
+          1.2930946350097656
+        ],
+        "pct_null_at_least_as_extreme": 0.013333333333333334
+      },
+      "novelty": {
+        "real_coef": 0.21600393950939178,
+        "null_mean": 1.0428428649902344,
+        "null_ci95": [
+          -0.18117256462574005,
+          2.1929972171783447
+        ],
+        "pct_null_at_least_as_extreme": 0.8966666666666666
+      }
+    }
+  },
+  "HotpotQA lockbox": {
+    "n_conflicting_pairs_real": 1347,
+    "n_conflicting_pairs_null_mean": 1580.7233333333334,
+    "n_permutations": 300,
+    "features": {
+      "query_align": {
+        "real_coef": -5.494317054748535,
+        "null_mean": -5.077703475952148,
+        "null_ci95": [
+          -5.998798370361328,
+          -4.153027534484863
+        ],
+        "pct_null_at_least_as_extreme": 0.15666666666666668
+      },
+      "doc_len": {
+        "real_coef": -4.36051082611084,
+        "null_mean": -4.699775218963623,
+        "null_ci95": [
+          -5.932714939117432,
+          -3.4482412338256836
+        ],
+        "pct_null_at_least_as_extreme": 0.7133333333333334
+      },
+      "redundancy": {
+        "real_coef": -0.20651015639305115,
+        "null_mean": 0.5203503966331482,
+        "null_ci95": [
+          -0.564329206943512,
+          1.8287932872772217
+        ],
+        "pct_null_at_least_as_extreme": 0.13333333333333333
+      },
+      "novelty": {
+        "real_coef": 0.73161381483078,
+        "null_mean": 1.0510425567626953,
+        "null_ci95": [
+          -0.011576644144952297,
+          2.07654070854187
+        ],
+        "pct_null_at_least_as_extreme": 0.73
+      }
+    }
+  },
+  "2WikiMultiHopQA": {
+    "n_conflicting_pairs_real": 1396,
+    "n_conflicting_pairs_null_mean": 1612.7333333333333,
+    "n_permutations": 300,
+    "features": {
+      "query_align": {
+        "real_coef": -3.3203506469726562,
+        "null_mean": -4.293979644775391,
+        "null_ci95": [
+          -5.212329387664795,
+          -3.540708303451538
+        ],
+        "pct_null_at_least_as_extreme": 1.0
+      },
+      "doc_len": {
+        "real_coef": -5.125055313110352,
+        "null_mean": -4.434333324432373,
+        "null_ci95": [
+          -5.601992130279541,
+          -3.0674829483032227
+        ],
+        "pct_null_at_least_as_extreme": 0.17333333333333334
+      },
+      "redundancy": {
+        "real_coef": 0.8220587968826294,
+        "null_mean": -0.27806219458580017,
+        "null_ci95": [
+          -1.8696898221969604,
+          1.2568421363830566
+        ],
+        "pct_null_at_least_as_extreme": 0.08
+      },
+      "novelty": {
+        "real_coef": 1.9929825067520142,
+        "null_mean": 0.7130581736564636,
+        "null_ci95": [
+          -0.49928778409957886,
+          1.8899304866790771
+        ],
+        "pct_null_at_least_as_extreme": 0.016666666666666666
+      }
+    }
+  },
+  "Qwen2.5-14B": {
+    "n_conflicting_pairs_real": 1585,
+    "n_conflicting_pairs_null_mean": 2021.86,
+    "n_permutations": 300,
+    "features": {
+      "query_align": {
+        "real_coef": -5.247865200042725,
+        "null_mean": -4.842885971069336,
+        "null_ci95": [
+          -5.74616003036499,
+          -4.101190090179443
+        ],
+        "pct_null_at_least_as_extreme": 0.14666666666666667
+      },
+      "doc_len": {
+        "real_coef": -3.9675779342651367,
+        "null_mean": -4.603690147399902,
+        "null_ci95": [
+          -5.927124500274658,
+          -3.4678235054016113
+        ],
+        "pct_null_at_least_as_extreme": 0.8133333333333334
+      },
+      "redundancy": {
+        "real_coef": -1.6314777135849,
+        "null_mean": 0.42119190096855164,
+        "null_ci95": [
+          -1.0593366622924805,
+          1.7478386163711548
+        ],
+        "pct_null_at_least_as_extreme": 0.0033333333333333335
+      },
+      "novelty": {
+        "real_coef": 0.13963019847869873,
+        "null_mean": 0.861828088760376,
+        "null_ci95": [
+          -0.07215534150600433,
+          1.7942925691604614
+        ],
+        "pct_null_at_least_as_extreme": 0.8966666666666666
+      }
+    }
+  },
+  "MuSiQue": {
+    "n_conflicting_pairs_real": 1634,
+    "n_conflicting_pairs_null_mean": 1740.9733333333334,
+    "n_permutations": 300,
+    "features": {
+      "query_align": {
+        "real_coef": -4.803763389587402,
+        "null_mean": -5.08779764175415,
+        "null_ci95": [
+          -5.985299587249756,
+          -4.190174579620361
+        ],
+        "pct_null_at_least_as_extreme": 0.7766666666666666
+      },
+      "doc_len": {
+        "real_coef": -3.6670641899108887,
+        "null_mean": -4.339296817779541,
+        "null_ci95": [
+          -5.669663429260254,
+          -3.1275172233581543
+        ],
+        "pct_null_at_least_as_extreme": 0.83
+      },
+      "redundancy": {
+        "real_coef": 2.1181814670562744,
+        "null_mean": 0.6166371703147888,
+        "null_ci95": [
+          -0.5667656064033508,
+          1.7725964784622192
+        ],
+        "pct_null_at_least_as_extreme": 0.01
+      },
+      "novelty": {
+        "real_coef": 1.9957032203674316,
+        "null_mean": 0.7748083472251892,
+        "null_ci95": [
+          -0.21259945631027222,
+          1.7488871812820435
+        ],
+        "pct_null_at_least_as_extreme": 0.01
+      }
+    }
+  }
+}

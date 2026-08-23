@@ -1,0 +1,94 @@
+{
+  "n_states_compared": 686,
+  "n_replicates": 3,
+  "greedy": {
+    "opportunity": {
+      "decisive": 201,
+      "states": 686,
+      "rate": 0.29300291545189505
+    },
+    "oracle_vs_ce": {
+      "n_questions": 350,
+      "mean": 0.11658958735009156,
+      "ci95": [
+        0.09254596990311274,
+        0.14237921835400827
+      ],
+      "excludes_zero": true
+    }
+  },
+  "sampled_mean_over_replicates": {
+    "opportunity": {
+      "decisive": 274,
+      "states": 686,
+      "rate": 0.39941690962099125
+    },
+    "oracle_vs_ce": {
+      "n_questions": 350,
+      "mean": 0.11130214167597455,
+      "ci95": [
+        0.09114493182233604,
+        0.13284614260968136
+      ],
+      "excludes_zero": true
+    }
+  },
+  "sampled_per_replicate": {
+    "arm_results_T0.7_r1.jsonl": {
+      "opportunity": {
+        "decisive": 194,
+        "states": 686,
+        "rate": 0.282798833819242
+      },
+      "oracle_vs_ce": {
+        "n_questions": 350,
+        "mean": 0.12735680487683285,
+        "ci95": [
+          0.102567639850553,
+          0.15377611805665028
+        ],
+        "excludes_zero": true
+      }
+    },
+    "arm_results_T0.7_r2.jsonl": {
+      "opportunity": {
+        "decisive": 189,
+        "states": 686,
+        "rate": 0.2755102040816326
+      },
+      "oracle_vs_ce": {
+        "n_questions": 350,
+        "mean": 0.12517379679144386,
+        "ci95": [
+          0.10112296433725003,
+          0.15108494913116766
+        ],
+        "excludes_zero": true
+      }
+    },
+    "arm_results_T0.7_r3.jsonl": {
+      "opportunity": {
+        "decisive": 204,
+        "states": 686,
+        "rate": 0.29737609329446063
+      },
+      "oracle_vs_ce": {
+        "n_questions": 350,
+        "mean": 0.14148430028577083,
+        "ci95": [
+          0.11462257781900638,
+          0.16940838102917935
+        ],
+        "excludes_zero": true
+      }
+    }
+  },
+  "label_agreement": {
+    "n_greedy_decided_pairs_evaluated": 3167,
+    "collapsed_to_exact_tie_under_sampling": 0.21660877802336595,
+    "sign_agreement_among_nonzero": 0.7799274486094316,
+    "still_decided_at_tau_under_sampling": 0.7025576255131039,
+    "sign_agreement_among_still_decided": 0.8031460674157304,
+    "note": "greedy-decided pairs only; exact ties under sampling are indeterminate rather than contradictory"
+  }
+}

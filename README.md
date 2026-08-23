@@ -80,6 +80,14 @@ Each gate is pre-registered: the driver runs base trajectories, plans interventi
 - **Interventional utility labels** (`results/*/utilities.jsonl`): for every audited (state, candidate-document) pair — base/arm/control outcomes (EM/F1/turns/calls/tokens), task and cost utility axes, diagnostic axes, candidate type, and config hash. Documents are referenced by title (enwiki-20171001); no article text is redistributed.
 - **Evaluation splits** (`results/*/questions.json`): question ids and strata for every setting, including the sealed lockbox split.
 - **Hypothesis reports** (`results/*/*_REPORT.json`): the pre-registered H1/H2/H3 test outputs backing the paper's tables.
+- **Review analyses** (`results/*/report.json`): choice-space, relevance-baseline, state-aware, lookahead, matching, placebo/null, and gate-ablation checks added after the initial release.
+- **Result ledger** (`paper/results_master.md`): consolidated experimental results and provenance notes.
+- **Supplementary material** ([`supplementary.pdf`](supplementary.pdf)): compiled appendix; the LaTeX source is in `paper/supplementary.tex`.
+
+The repository intentionally excludes raw trajectories, retrieval indexes, model
+checkpoints, and other large intermediate artifacts. The released labels and
+summary reports are sufficient to audit the reported statistics, while the
+scripts reproduce each analysis from the corresponding local experiment output.
 
 ## License
 

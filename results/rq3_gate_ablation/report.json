@@ -1,0 +1,180 @@
+{
+  "train_prevalence": 0.17778716216216217,
+  "settings": {
+    "HotpotQA dev": {
+      "n_states": 579,
+      "prevalence": 0.13989637305699482,
+      "has_probe": true,
+      "feature_sets": {
+        "ce_margin_only": {
+          "auc": 0.5310253359115474,
+          "average_precision": 0.1451950656146511,
+          "ap_over_prevalence": 1.0378758393936172,
+          "precision_at_prevalence": 0.1111111111111111,
+          "lift_over_prevalence": 0.794238683127572
+        },
+        "ce_only": {
+          "auc": 0.5472755218404483,
+          "average_precision": 0.1536428133913388,
+          "ap_over_prevalence": 1.09826159201957,
+          "precision_at_prevalence": 0.13580246913580246,
+          "lift_over_prevalence": 0.9707361682670325
+        },
+        "phi_only": {
+          "auc": 0.5780653478109969,
+          "average_precision": 0.17543990220706215,
+          "ap_over_prevalence": 1.2540704120727035,
+          "precision_at_prevalence": 0.19753086419753085,
+          "lift_over_prevalence": 1.4119798811156836
+        },
+        "full": {
+          "auc": 0.5987654320987654,
+          "average_precision": 0.1759169982396791,
+          "ap_over_prevalence": 1.2574807651947433,
+          "precision_at_prevalence": 0.18518518518518517,
+          "lift_over_prevalence": 1.3237311385459534
+        }
+      }
+    },
+    "HotpotQA lockbox": {
+      "n_states": 686,
+      "prevalence": 0.1880466472303207,
+      "has_probe": true,
+      "feature_sets": {
+        "ce_margin_only": {
+          "auc": 0.4785186422278819,
+          "average_precision": 0.1754113987928934,
+          "ap_over_prevalence": 0.9328079036583324,
+          "precision_at_prevalence": 0.15384615384615385,
+          "lift_over_prevalence": 0.8181276088252833
+        },
+        "ce_only": {
+          "auc": 0.4937024202190584,
+          "average_precision": 0.18879787137138992,
+          "ap_over_prevalence": 1.0039948818664612,
+          "precision_at_prevalence": 0.17829457364341086,
+          "lift_over_prevalence": 0.9481401358091462
+        },
+        "phi_only": {
+          "auc": 0.5474232112785826,
+          "average_precision": 0.22989817961810205,
+          "ap_over_prevalence": 1.2225593117675815,
+          "precision_at_prevalence": 0.23255813953488372,
+          "lift_over_prevalence": 1.2367045249684514
+        },
+        "full": {
+          "auc": 0.6371898181008447,
+          "average_precision": 0.28050365073721073,
+          "ap_over_prevalence": 1.491670576788578,
+          "precision_at_prevalence": 0.2868217054263566,
+          "lift_over_prevalence": 1.525268914127757
+        }
+      }
+    },
+    "2WikiMultiHopQA": {
+      "n_states": 819,
+      "prevalence": 0.20024420024420025,
+      "has_probe": false,
+      "feature_sets": {
+        "ce_margin_only": {
+          "auc": 0.5000605101470863,
+          "average_precision": 0.203957557631383,
+          "ap_over_prevalence": 1.0185441445128212,
+          "precision_at_prevalence": 0.1951219512195122,
+          "lift_over_prevalence": 0.97441998810232
+        },
+        "ce_only": {
+          "auc": 0.5409514056972631,
+          "average_precision": 0.24011271758513109,
+          "ap_over_prevalence": 1.1990994859891606,
+          "precision_at_prevalence": 0.21951219512195122,
+          "lift_over_prevalence": 1.09622248661511
+        },
+        "phi_only": {
+          "auc": 0.5378514243157699,
+          "average_precision": 0.22927048465590472,
+          "ap_over_prevalence": 1.1449544325194265,
+          "precision_at_prevalence": 0.2621951219512195,
+          "lift_over_prevalence": 1.3093768590124926
+        },
+        "full": {
+          "auc": 0.5272854217091789,
+          "average_precision": 0.24080543557816667,
+          "ap_over_prevalence": 1.202558852064137,
+          "precision_at_prevalence": 0.25609756097560976,
+          "lift_over_prevalence": 1.278926234384295
+        }
+      }
+    },
+    "Qwen2.5-14B": {
+      "n_states": 838,
+      "prevalence": 0.16706443914081145,
+      "has_probe": false,
+      "feature_sets": {
+        "ce_margin_only": {
+          "auc": 0.5145159639787147,
+          "average_precision": 0.17377735686019585,
+          "ap_over_prevalence": 1.0401816074917438,
+          "precision_at_prevalence": 0.17142857142857143,
+          "lift_over_prevalence": 1.026122448979592
+        },
+        "ce_only": {
+          "auc": 0.5352844862873516,
+          "average_precision": 0.19391182124450462,
+          "ap_over_prevalence": 1.1607007585921063,
+          "precision_at_prevalence": 0.17857142857142858,
+          "lift_over_prevalence": 1.0688775510204083
+        },
+        "phi_only": {
+          "auc": 0.5683995088006549,
+          "average_precision": 0.2052864115916228,
+          "ap_over_prevalence": 1.2287858065269994,
+          "precision_at_prevalence": 0.24285714285714285,
+          "lift_over_prevalence": 1.453673469387755
+        },
+        "full": {
+          "auc": 0.5603254195661073,
+          "average_precision": 0.20760494658224266,
+          "ap_over_prevalence": 1.242663894542281,
+          "precision_at_prevalence": 0.17857142857142858,
+          "lift_over_prevalence": 1.0688775510204083
+        }
+      }
+    },
+    "MuSiQue": {
+      "n_states": 959,
+      "prevalence": 0.19499478623566216,
+      "has_probe": false,
+      "feature_sets": {
+        "ce_margin_only": {
+          "auc": 0.49780762516970983,
+          "average_precision": 0.20467430727645097,
+          "ap_over_prevalence": 1.0496398966744196,
+          "precision_at_prevalence": 0.2192513368983957,
+          "lift_over_prevalence": 1.1243958935056764
+        },
+        "ce_only": {
+          "auc": 0.5243689562494804,
+          "average_precision": 0.2234286375816229,
+          "ap_over_prevalence": 1.1458185210736702,
+          "precision_at_prevalence": 0.20855614973262032,
+          "lift_over_prevalence": 1.0695473133346678
+        },
+        "phi_only": {
+          "auc": 0.502126568950708,
+          "average_precision": 0.20022701493291717,
+          "ap_over_prevalence": 1.0268326594688104,
+          "precision_at_prevalence": 0.1925133689839572,
+          "lift_over_prevalence": 0.9872744430781548
+        },
+        "full": {
+          "auc": 0.5045440691585159,
+          "average_precision": 0.20818969825517109,
+          "ap_over_prevalence": 1.0676680247417596,
+          "precision_at_prevalence": 0.18716577540106952,
+          "lift_over_prevalence": 0.9598501529926505
+        }
+      }
+    }
+  }
+}

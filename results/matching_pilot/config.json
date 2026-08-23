@@ -1,0 +1,9 @@
+{
+  "gate_dir": "results/lockbox",
+  "out": "results/matching_pilot",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "index": "data/bm25_index",
+  "gpu_mem": 0.4,
+  "seed": 42,
+  "limit_states": 15
+}

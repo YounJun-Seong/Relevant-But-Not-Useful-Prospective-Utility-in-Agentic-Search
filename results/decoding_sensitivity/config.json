@@ -1,0 +1,14 @@
+{
+  "gate_dir": "results/lockbox",
+  "out": "results/decoding_sensitivity",
+  "model": "Qwen/Qwen2.5-7B-Instruct",
+  "index": "data/bm25_index",
+  "temperature": 0.7,
+  "top_p": 1.0,
+  "replicates": 3,
+  "seed_base": 101,
+  "gpu_mem": 0.4,
+  "max_turns": 4,
+  "docs_per_search": 3,
+  "limit_states": 0
+}
