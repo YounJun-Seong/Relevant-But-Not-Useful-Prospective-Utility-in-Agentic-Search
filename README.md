@@ -81,8 +81,9 @@ Each gate is pre-registered: the driver runs base trajectories, plans interventi
 - **Evaluation splits** (`results/*/questions.json`): question ids and strata for every setting, including the sealed lockbox split.
 - **Hypothesis reports** (`results/*/*_REPORT.json`): the pre-registered H1/H2/H3 test outputs backing the paper's tables.
 - **Review analyses** (`results/*/report.json`): choice-space, relevance-baseline, state-aware, lookahead, matching, placebo/null, and gate-ablation checks added after the initial release.
+- **Post-hoc replications** (`results/xfamily_phi4/XFAMILY_REPORT.json`, `results/myopic/report.json`): a cross-family replication with `microsoft/phi-4` and a forced-answer myopic-utility comparison on the HotpotQA lockbox, both conducted after the confirmatory analyses.
 - **Result ledger** (`paper/results_master.md`): consolidated experimental results and provenance notes.
-- **Supplementary material** ([`supplementary.pdf`](supplementary.pdf)): compiled appendix; the LaTeX source is in `paper/supplementary.tex`.
+- **Supplementary material** ([`supplementary.pdf`](supplementary.pdf)): compiled appendix, including the Phi-4 cross-family replication and myopic-utility appendix sections; the LaTeX source is in `paper/supplementary.tex`.
 
 The repository intentionally excludes raw trajectories, retrieval indexes, model
 checkpoints, and other large intermediate artifacts. The released labels and

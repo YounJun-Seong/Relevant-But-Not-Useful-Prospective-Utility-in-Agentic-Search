@@ -867,3 +867,80 @@ D_t에 없던 BGE/BGE-state full-pool argmax **3,861개 arm**을 동결 greedy �
 논증이 아니라 **실측으로** 닫혔다.
 
 표: `tab:choicespace`, `tab:expanded` (총 17개, 자동 생성).
+
+---
+
+# 29. Myopic utility vs Full PIU — 실행 완료 (2026-08-23, HotpotQA lockbox)
+
+같은 frozen state·같은 후보·같은 동결 greedy 정책. **Full**: 주입 → 정상 search continuation →
+답. **Myopic**: 주입 → 추가 retrieval 금지(harness의 forced-answer 블록) → 즉시 답.
+6,173 arms(686 base + 5,487 개입), 69초. 스크립트 `myopic_vs_full.py` + `analyze_myopic.py`,
+결과 `results/myopic/report.json`. 금지에도 검색을 시도한 비율 2.7% (빈 답으로 처리, 확증 프로토콜과 동일).
+
+| 지표 | 값 |
+|---|---|
+| (state, candidate) 수준 상관 | Pearson 0.661 / Spearman 0.652 |
+| state 내 Spearman 평균 (분산 있는 159 state) | **0.392** |
+| myopic 최댓값 **동점** state 비율 | **84.1%** (opportunity state에서 69.0%) |
+| 승자 any-max 일치 (관대) | 96.4% 전체 / 85.3% opportunity |
+| 승자 strict 일치 (CE tie-break, opportunity state) | **27.1%** |
+| Full oracle − CE | +0.117 [+0.092, +0.142] |
+| Myopic oracle − CE (myopic 결과 기준) | +0.083 [+0.063, +0.104] |
+| **Full headroom, myopic→CE tie-break로 선택 시** | **+0.015 [+0.003, +0.027]** (12.7% 회수) |
+| Full headroom, myopic 최댓값 집합 내 최선 (상한) | +0.093 [+0.071, +0.116] (80%) |
+| base F1: full / myopic | 0.327 / 0.278 |
+
+**해석 (정직하게):**
+- myopic utility는 full PIU와 **중간 정도 상관**(ρ≈0.65)하지만 **너무 거칠다** — 즉시 답하면 많은
+  후보가 같은 답을 내서 84%의 state에서 최댓값이 동점이다.
+- 동점 집합 *안에는* full headroom의 80%가 들어 있다(상한 +0.093). 그러나 myopic은 그 안을
+  구분하지 못하므로 selector로 쓰면 **12.7%만** 회수된다(+0.015, 유의하나 작음).
+- opportunity state에서 strict 승자 일치는 27%뿐 → **"문서를 읽기만 하면 되는" reader 효과로는
+  PIU 순위를 재구성할 수 없다.** W1 분해(query_changed에서 headroom 4배)와 같은 방향.
+- myopic oracle 자체 headroom(+0.083)이 full(+0.117)보다 작다 → continuation이 가치를 *만든다*.
+
+**논문 문장 후보**: "Myopic (retrieval-free) utility correlates only moderately with full PIU
+(ρ=0.65) and is coarse: its maximum is tied in 84% of states. Used as a selector with CE
+tie-breaking it recovers 13% of the full headroom, and the set of myopic-best candidates contains
+80% of it — the continuation, not the read, determines which of them is useful."
+
+---
+
+# 30. Cross-family replication — microsoft/phi-4 ✅ (2026-08-24)
+
+**모델 선택**: Mistral-7B-v0.3(사전등록 FAIL, malformed 42.2%)과 Llama-3.1-8B(FAIL, 재측정 금지)는
+불가. **microsoft/phi-4 (14B, Microsoft 계열, MIT, system role 지원)** 선택.
+
+**① Compliance 스모크 (사전등록 프로토콜, dev offset 1700, n=50):** **PASS**
+- valid final answer 92.0% (기준 ≥90) / malformed search **0.0%** (≤5) / token-limit 2.0% (≤10) /
+  hallucinated leakage **0** (=0) / 참고 F1 0.563 (기준 아님)
+- Mistral 42.2%, Llama 5.9%와 대조적으로 여유 있게 통과.
+
+**② 복제 (동결 프로토콜, HotpotQA representative 350문항, failure enrichment 없음):**
+base 400(EM **0.422** — Qwen-14B 0.427과 대등) → 860 states → 7,730 arms (base+I2_add;
+control은 확증 지표가 raw 정의라 생략) → 6,870 interventions. 총 GPU 시간 약 45분.
+
+| 지표 | Phi-4 | (Qwen 5세팅 범위) |
+|---|---|---|
+| **Oracle−CE ΔF1** | **+0.081 [+0.063, +0.102]** | +0.082 ~ +0.142 |
+| Opp-Base / Opp-CE | 25.0% / 15.8% | 21.8~32.1% / 14.0~20.0% |
+| CE−Random (paired) | +0.048 [+0.029, +0.067] | +0.023 ~ +0.072 |
+| Oracle−BGE(q_t) | +0.071 [+0.053, +0.089] | 유의 유지 |
+| Oracle−BGE(state) | +0.078 [+0.060, +0.099] | 유의 유지 |
+| BGE(q_t)−CE (paired) | **+0.011 [+0.002, +0.021]** | 9/10 무차별 |
+| BGE(state)−CE (paired) | +0.003 [−0.010, +0.016] | 무차별 |
+
+- **현상이 다른 model family에서 완전히 재현된다**: headroom 유의, 크기가 Qwen 범위 하단과 일치,
+  representative 표본만으로, CE는 random보다 유의하게 나음, 강한 selector도 headroom을 못 닫음.
+- 특기: BGE(q_t)−CE가 여기서 처음으로 **작지만 유의한 양수**(+0.011). 정직하게 보고할 것 —
+  "stronger relevance가 약간의 이득을 줄 수는 있으나 Oracle 대비 headroom(+0.071)은 그대로"가
+  정확한 서술이다. 강한 selector 무용론이 아니라 headroom 지속이 주장이므로 오히려 무해하다.
+- **표기 필수**: post-hoc cross-family replication (모든 분석 후 실행, 사전등록 아님).
+  단 compliance 기준·프로토콜·τ·추정량은 동결본 그대로.
+- **Limitation 업그레이드**: "Cross-family validation was constrained by tool-protocol
+  compliance" → "…; a post-hoc replication with a compliant 14B agent from a different
+  family (phi-4) reproduces the headroom (+0.081 [0.063, 0.102]) on a representative sample."
+- 산출물: `results/xfamily_phi4/XFAMILY_REPORT.json`, 드라이버 `xfamily_phi4_driver.sh`,
+  스모크 로그 `logs/smoke_phi4.log`. 표 `tab:xfamily`.
+
+(29절 myopic 결과 포함, 표 `tab:myopic` — 총 19개 표 자동 생성.)

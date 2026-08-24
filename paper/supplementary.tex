@@ -23,19 +23,21 @@
 \vspace{-2.5em}
 
 \noindent This supplement provides implementation details, the preregistration
-and provenance protocol, the agent compliance audit, exact feature definitions,
-additional figures, and secondary results referenced in the main paper.
-Section~\ref{sec:agent} details the agent and retrieval stack;
-Section~\ref{sec:candidates} the candidate families;
-Section~\ref{sec:prereg} the preregistration chain and lockbox protocol;
-Section~\ref{sec:compliance} the cross-family compliance audit;
-Section~\ref{sec:labels} pairwise label construction;
-Section~\ref{sec:features} feature definitions;
-Section~\ref{sec:tables} the exact-value tables referenced from the main
-paper (headroom and signature coefficients);
-Section~\ref{sec:case} the full trajectory of the case study;
-Section~\ref{sec:figs} additional figures;
-Section~\ref{sec:secondary} additional quantitative results; and
+and provenance protocol, the agent compliance audit, exact label and feature
+definitions, and detailed diagnostic and robustness results referenced in the
+main paper.
+Section~\ref{sec:agent} details the agent and retrieval stack, including the
+stronger relevance selectors;
+Section~\ref{sec:candidates} the candidate pool, selector configurations, and
+the choice-space consistency audit;
+Section~\ref{sec:prereg} the preregistration chain and analysis provenance;
+Section~\ref{sec:compliance} the cross-family compliance audit and post-hoc
+replication;
+Section~\ref{sec:labels} outcome labels and evaluation targets;
+Section~\ref{sec:features} observable state, candidate, and continuation
+features;
+Section~\ref{sec:diagnostic} additional diagnostic results;
+Section~\ref{sec:robustness} robustness and sensitivity results; and
 Section~\ref{sec:repro} reproducibility information.
 
 \section{Agent and Retrieval Stack}
@@ -47,16 +49,30 @@ action (a query wrapped in \texttt{<search>} tags) or a final answer
 (wrapped in \texttt{<answer>} tags).
 Each search returns the top-3 documents (title and abstract text) from the
 fixed corpus, appended to the context as an observation block.
-Episodes allow at most 4 search turns; decoding is greedy
-(temperature $0$) with stop sequences on the action delimiters and on
+Episodes allow at most 4 search turns; confirmatory continuations use greedy
+decoding (temperature $0$) with stop sequences on the action delimiters and on
 generation of an observation-opening tag, so that the model cannot hallucinate
 its own retrieval results.
 Unclosed action tags at end-of-generation are parsed conservatively
 (an unclosed \texttt{<search>}/\texttt{<answer>} span is accepted only when it
 is unambiguous; occurrences are counted and audited).
-A same-code control comparison between parser versions showed no evidence of
-a behavioral effect of these parsing safeguards, and no safeguard-specific
-mechanism activated in the confirmatory runs.
+A preregistered parser audit found no evidence that these safeguards caused
+the observed trajectory differences: parser versions produced 94\% identical
+trajectories, compared with 76\% under a same-code control rerun in the same
+production environment, and no safeguard-specific mechanism activated in the
+confirmatory runs. Additional post-hoc robustness analyses are described in
+Secs.~\ref{sec:diagnostic}--\ref{sec:robustness}.
+
+\stitle{Continuation horizon.}
+Intervention replays do not receive a fresh search budget. The replayed
+episode inherits the number of search calls already consumed by the frozen
+prefix, so a state reached after $k$ searches has at most $4-k$ search turns
+remaining. On the HotpotQA lockbox intervention arms, the frozen states occur
+after 1/2/3/4 consumed searches in 2{,}800/1{,}895/656/136 cases,
+respectively. The realized continuation uses 0/1/2/3 additional searches in
+2{,}989/1{,}739/608/151 cases, for an average of 0.62 additional search steps.
+When the global search budget is exhausted, the agent is instructed to
+produce a final answer immediately.
 
 \stitle{Corpus.}
 All settings use the official HotpotQA \texttt{enwiki-20171001} abstract
@@ -70,12 +86,24 @@ evaluation is restricted to covered questions (main paper, Sec.~4.1).
 Lexical retrieval uses BM25 (\texttt{bm25s}).
 Dense retrieval uses \texttt{intfloat/e5-base-v2} with brute-force inner
 product over the full corpus (fp32).
-The relevance baseline is the MS~MARCO cross-encoder
+The primary relevance baseline is the MS~MARCO cross-encoder
 \texttt{cross-encoder/}\allowbreak\texttt{ms-marco-MiniLM-L6-v2},
-scoring each candidate's title and text against the current query $q_t$.
+scoring each candidate's full title and passage text against the current
+query $q_t$ in the original confirmatory configuration.
 All retriever configurations are fixed across the five evaluation settings.
 
-\section{Candidate Families}
+\stitle{Stronger relevance selectors.}
+We additionally evaluate \texttt{BAAI/bge-reranker-v2-m3} using either the
+current query $q_t$ or a state-aware representation containing $q_0$, $q_t$,
+and consumed evidence. We also evaluate a Qwen2.5-7B listwise relevance
+ranker over the observable state. These models are used only as relevance
+selectors; they do not observe intervention outcomes. For BGE rescoring, each
+document is represented as its title followed by the first 600 characters of
+passage text (tokenizer maximum length 512); the exact full-pool rescoring
+audit uses this identical configuration. The MiniLM CE baseline scores the
+full passage text (title and text, tokenizer maximum length 384) throughout.
+
+\section{Candidate Pool and Relevance Selectors}
 \label{sec:candidates}
 
 For every eligible state, the retrieval pool $\mathcal{C}_t$ is the union of
@@ -88,8 +116,10 @@ Up to eight typed candidates are drawn per state:
 \begin{itemize}\itemsep0.15em
   \item \textbf{bm25\_top} --- BM25 top-1 under $q_t$;
   \item \textbf{dense\_top} --- dense top-1 under $q_t$;
-  \item \textbf{ce\_top} --- cross-encoder argmax over $\mathcal{C}_t$
-        (the relevance-selection baseline);
+  \item \textbf{ce\_top} --- the highest-ranked CE candidate not already
+        retained by an earlier standard family; the full-pool CE argmax is
+        always retained in $\mathcal{D}_t$ and defines the relevance-selection
+        baseline, as detailed below;
   \item \textbf{mid\_rel} --- a BM25 rank 9--16 document under $q_t$;
   \item \textbf{novelty} --- in the pool but outside BM25 top-20 under $q_t$
         and outside dense top-5 (low current-query relevance, reached via
@@ -99,17 +129,15 @@ Up to eight typed candidates are drawn per state:
         (retained only if overlap $>0.05$);
   \item \textbf{entity\_bridge} --- reached only via entity-title queries and
         absent from the BM25 ranking under $q_t$;
-  \item \textbf{random} --- a random remaining pool member (control).
+  \item \textbf{random} --- a random remaining pool member.
 \end{itemize}
 
 \noindent
 \textbf{Consistency of the CE baseline.}
-The \textbf{ce\_top} family is constructed so that the CE argmax over the full
-pool $\mathcal{C}_t$ is always contained in the retained intervention set
-$\mathcal{D}_t$: candidates are drawn without replacement, and if the
-pool-level CE argmax has already been taken as \textbf{bm25\_top} or
-\textbf{dense\_top}, it remains in $\mathcal{D}_t$ under that label while
-\textbf{ce\_top} takes the next-ranked document.
+Candidates are drawn without replacement, and if the pool-level CE argmax has
+already been taken as \textbf{bm25\_top} or \textbf{dense\_top}, it remains in
+$\mathcal{D}_t$ under that label while \textbf{ce\_top} takes the next-ranked
+document.
 Consequently, $\arg\max_{d\in\mathcal{D}_t} R_{\mathrm{CE}}(q_t,d)$ and
 $\arg\max_{d\in\mathcal{C}_t} R_{\mathrm{CE}}(q_t,d)$ select the same document,
 and the main paper's $d_{\mathrm{CE}}$ (defined over $\mathcal{D}_t$) equals
@@ -117,62 +145,168 @@ the pool-level CE selection.
 We verified this empirically: in all 3{,}881 evaluated states across the five
 settings, the pool-level CE argmax is present in $\mathcal{D}_t$
 (zero exceptions).
-
 Standard-retrieval-only analyses restrict the oracle to
-\{bm25\_top, dense\_top, ce\_top\}; leave-one-family-out analyses remove one
-family at a time (main paper, Sec.~5.5).
+\{bm25\_top, dense\_top, ce\_top\}.
 
-\section{Preregistration, Lockbox, and Provenance}
+\subsection{Choice-Space Consistency Audit}
+\label{sec:choicespace}
+
+\stitle{Full-pool argmax retention.}
+Table~\ref{tab:s1} reports, for each relevance selector, the fraction of
+evaluated states whose full-pool argmax over $\mathcal{C}_t$ is already
+contained in the retained intervention set $\mathcal{D}_t$. By construction
+this holds for the CE baseline; for the stronger selectors the full-pool
+argmax is frequently absent from $\mathcal{D}_t$.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Fraction of states whose full-pool selector argmax is retained in
+$\mathcal{D}_t$.}
+\label{tab:s1}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Setting} & \textbf{CE} & \textbf{BGE ($q_t$)} & \textbf{BGE-State} \\
+\midrule
+HotpotQA dev     & 1.000     & 0.668 & 0.366 \\
+HotpotQA lockbox & 1.000     & 0.650 & 0.318 \\
+2Wiki            & 1.000     & 0.578 & 0.249 \\
+Qwen2.5-14B      & 1.000     & 0.706 & 0.372 \\
+MuSiQue          & 1.000$^*$ & 0.602 & 0.264 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\noindent
+$^*$The original logged candidate pools retain the CE full-pool argmax in all
+3{,}881 evaluated states. A single MuSiQue mismatch appears only when
+reconstructing the pool for the post-hoc audit, due to a dense-retrieval
+boundary-rank reconstruction difference; it is not a mismatch in the original
+intervention pool.
+
+\stitle{$\mathcal{D}_t$-space relevance quality.}
+Table~\ref{tab:s2} reports the support-document hit rate of each selector's
+choice within $\mathcal{D}_t$, computed only among states for which
+$\mathcal{D}_t$ contains at least one annotated support document.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Support hit rate of selector choices within $\mathcal{D}_t$, computed
+only among states for which $\mathcal{D}_t$ contains at least one annotated
+support document. The final column reports the BGE-State $-$ CE difference
+with question-level 95\% confidence intervals.}
+\label{tab:s2}
+\begin{tabular}{lcccl}
+\toprule
+\textbf{Setting} & \textbf{CE} & \textbf{BGE} & \textbf{BGE-State} &
+\textbf{BGE-State $-$ CE} \\
+\midrule
+HotpotQA dev     & 0.753 & 0.846 & 0.900 & +0.147 [0.074, 0.223] \\
+HotpotQA lockbox & 0.719 & 0.801 & 0.903 & +0.184 [0.100, 0.268] \\
+2Wiki            & 0.707 & 0.796 & 0.790 & +0.082 [0.007, 0.158] \\
+Qwen2.5-14B      & 0.749 & 0.819 & 0.852 & +0.103 [0.038, 0.172] \\
+MuSiQue          & 0.555 & 0.671 & 0.685 & +0.130 [0.044, 0.216] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\stitle{Rollout of missing full-pool argmax candidates.}
+Because BGE and BGE-State full-pool argmax candidates are frequently absent
+from $\mathcal{D}_t$, we conducted an explicitly post-hoc sensitivity analysis
+after the lockbox had been opened. We rolled out every missing full-pool BGE
+and BGE-State argmax under the same frozen greedy continuation policy,
+yielding 3{,}861 additional intervention arms and no missing outcomes.
+Table~\ref{tab:s3} reports the resulting downstream comparison.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Post-hoc full-pool choice-space sensitivity. Entries report
+downstream F1 differences between each selector's actual full-pool argmax and
+CE selection, with question-level 95\% confidence intervals.}
+\label{tab:s3}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Setting} & \textbf{BGE(full)$-$CE} & \textbf{BGE-State(full)$-$CE} \\
+\midrule
+HotpotQA dev     & $-$.019 [$-$.042, .004] & +.012 [$-$.016, .043] \\
+HotpotQA lockbox & +.008 [$-$.010, .026]   & +.024 [$-$.003, .051] \\
+2Wiki            & +.010 [$-$.006, .025]   & +.018 [$-$.007, .043] \\
+Qwen2.5-14B      & $-$.010 [$-$.029, .010] & $-$.009 [$-$.034, .016] \\
+MuSiQue          & $-$.001 [$-$.014, .012] & $-$.000 [$-$.017, .017] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+All 10 confidence intervals include zero. Thus, even when BGE and BGE-State
+are allowed to select their actual full-pool argmax candidates, their large
+relevance advantage does not yield a statistically detectable downstream gain
+over CE. This analysis is post hoc and is reported only as a choice-space
+sensitivity check.
+
+\section{Preregistration, Lockbox, and Analysis Provenance}
 \label{sec:prereg}
 
 \stitle{Preregistration chain.}
-All confirmatory decisions were fixed in a version-controlled design-revisions
-document \emph{before} the corresponding data were inspected, including:
-the preference threshold $\tau=0.1$ with sensitivity values fixed in advance;
-the primary Gate-2 endpoints; the lockbox endpoints (H1--H3) and the analysis
-freeze list; the predictor judgment bands and the pre-committed decision to
-stop the predictor line if strict criteria were not met (they were not; the
-result is reported as a negative finding rather than retried);
-the replication protocols for 2WikiMultiHopQA, the cross-scale agent, and
-MuSiQue; and the final review-defense analyses (cross-fitted oracle,
-question-clustered inference, pool-robustness, and effect-size
-decomposition).
-No acceptance criterion was relaxed after unblinding at any point;
-criteria that failed remain recorded as failures together with the
-adjudication that followed.
+All confirmatory decisions and pre-specified diagnostic analyses were fixed
+in a version-controlled design-revisions document \emph{before} the
+corresponding data were inspected, including: the primary endpoints and
+lockbox analysis freeze list; the replication protocols for
+2WikiMultiHopQA, the cross-scale agent, and MuSiQue; and additional
+robustness and diagnostic analyses (cross-fitted oracle, question-clustered
+inference, pool-robustness, and effect-size decomposition).
+No acceptance criterion was relaxed after unblinding at any point; criteria
+that failed remain recorded as failures together with the adjudication that
+followed.
 
-\stitle{Single-open lockbox.}
+\stitle{Single-open confirmatory lockbox.}
 The held-out HotpotQA lockbox was sealed before predictor development:
-question IDs were selected and committed, all models to be evaluated were
-frozen to disk, and SHA-256 hashes of the frozen artifacts and the design
-document were recorded in a provenance file within the repository before
-opening.
-The evaluation script refuses to run if a lockbox report already exists, so
-the lockbox was evaluated exactly once.
+question IDs were selected and committed, all models used for confirmatory
+evaluation were frozen to disk, and SHA-256 hashes of the frozen artifacts and
+design document were recorded before opening. The preregistered confirmatory
+lockbox evaluation was executed once. After all confirmatory analyses were
+completed, we conducted explicitly post-hoc robustness and diagnostic
+analyses on the already opened lockbox. These analyses introduced no new
+confirmatory hypothesis testing and are reported separately from the
+preregistered results.
+
+\stitle{Confirmatory versus post-hoc analyses.}
+Confirmatory (frozen before the corresponding data were inspected): the
+primary Oracle--CE endpoint and opportunity rates, the lockbox evaluation,
+the representative non-enriched strata, and the split-replay and noise
+checks. Explicitly post-hoc and exploratory: the choice-space full-pool
+rollout expansion, winner characterization, the within-state
+outcome-permutation analysis, budgeted lookahead diagnostics, the
+post-rollout continuation scorer, sampled-decoding sensitivity, the Phi-4
+cross-family replication, the forced-answer myopic-utility analysis, and
+alternative control-matching specifications.
 
 \stitle{Measurement-integrity control.}
-A preregistered harness audit compared agent behavior across parser versions.
-The strict no-op criterion (99\% identical trajectories) was \emph{not} met
-(94\%); a preregistered same-code control (re-running the identical legacy
-code twice under production conditions) yielded 76\% identical trajectories,
-attributing the discrepancy to serving-level nondeterminism, and zero
-activations of the new parsing mechanisms were observed in confirmatory runs.
-We therefore report ``no evidence of a behavioral effect'' rather than a
-proven no-op, and record the original criterion as failed.
+A preregistered harness audit compared agent behavior across parser
+versions. The strict no-op criterion (99\% identical trajectories) was
+\emph{not} met (94\%); a preregistered same-code control (re-running the
+identical legacy code twice under production conditions) yielded 76\%
+identical trajectories, attributing the discrepancy to serving-level
+nondeterminism, and zero activations of the new parsing mechanisms were
+observed in confirmatory runs. We therefore report ``no evidence of a
+behavioral effect'' rather than a proven no-op, and record the original
+criterion as failed.
 
 \section{Cross-Family Compliance Audit}
 \label{sec:compliance}
 
-Cross-family agent replications were subject to preregistered tool-protocol
-compliance criteria evaluated on a 30-question smoke set before any
-confirmatory run (malformed action rate $\le5\%$, valid answer rate, token-limit
-truncation rate, and zero answer leakage).
+Cross-family agent replications were subject to preregistered
+tool-protocol compliance criteria evaluated on a 30-question smoke set
+before any confirmatory run (malformed action rate $\le5\%$, valid answer
+rate, token-limit truncation rate, and zero answer leakage).
 Table~\ref{tab:compliance} summarizes the audit.
-Only Qwen2.5-14B passed; Mistral-7B-v0.3 and Llama-3.1-8B were excluded
-\emph{before} confirmatory evaluation, and the preregistration prohibits
-re-measuring an excluded model.
-Consequently, the main paper claims cross-scale transfer within the Qwen2.5
-family only.
+Only Qwen2.5-14B passed this preregistered audit; Mistral-7B-v0.3 and
+Llama-3.1-8B were excluded \emph{before} confirmatory evaluation, and the
+preregistration prohibits re-measuring an excluded model. We therefore
+retain Qwen2.5-14B as the only preregistered model-transfer evaluation.
+After completion of the confirmatory analyses, we additionally conducted the
+explicitly post-hoc Phi-4 cross-family replication described below.
 
 \begin{table}[h]
 \centering
@@ -193,30 +327,87 @@ Qwen2.5-14B-Instruct & 0.0\% & 93.3\% & 6.7\% & \textbf{passed} \\
 \end{tabular}
 \end{table}
 
-\section{Pairwise Label Construction}
+\subsection{Post-hoc Cross-Family Replication with Phi-4}
+\label{sec:phi4}
+
+To test whether the observed prospective headroom is specific to the
+Qwen2.5 agent family, we conducted an explicitly post-hoc replication with
+\texttt{microsoft/phi-4} after completing the confirmatory analyses. Before
+examining replication outcomes, we fixed a separate post-hoc
+protocol-compliance screen using the same tool-use criteria. On a
+50-question development smoke set, Phi-4 achieved a 92.0\% valid-final
+rate, 0.0\% malformed-search rate, 2.0\% token-limit truncation rate, and
+zero retrieval leakage, satisfying the fixed compliance thresholds. We then
+evaluated Phi-4 on a representative, non-enriched HotpotQA sample of 350
+questions and 860 frozen states under the same frozen-state intervention and
+greedy continuation protocol. The replication yields significant
+Oracle--CE headroom of \textbf{+0.081 F1} (95\% CI [0.063, 0.102]). CE also
+significantly exceeds uniform random selection by \textbf{+0.048 F1}
+[0.029, 0.067]. Stronger relevance does not eliminate the gap: residual
+Oracle--BGE($q_t$) headroom is \textbf{+0.071} [0.053, 0.089], and
+Oracle--BGE-State headroom is \textbf{+0.078} [0.060, 0.099]. Query-only
+BGE improves slightly over CE (+0.011 [0.002, 0.021]), whereas BGE-State
+does not (+0.003 [$-$0.010, 0.016]). Thus, stronger relevance can improve
+selection while substantial prospective headroom remains. Because this
+experiment was conducted after the confirmatory analyses, we treat it
+strictly as a post-hoc cross-family replication.
+
+\section{Outcome Labels and Evaluation Targets}
 \label{sec:labels}
 
-For candidates $d_i, d_j$ at the same state, the preference label is decided
-by the difference in \emph{raw} intervention outcomes (downstream answer F1)
-with a preregistered tie zone $\tau=0.1$: pairs with $|U_i-U_j|\le\tau$ are
-ties and are excluded from accuracy denominators.
-Labels therefore never depend on the matched-control arms, consistent with the
-note on control matching in Sec.~\ref{sec:case}.
-Label reliability on the replay-audited subset is 97.8--99.0\% (three greedy
-continuations per intervention on 20\% of states; 115/579 primary states and
-137/686 lockbox states).
-The distribution of preference strengths is bimodal (most decided pairs are
-either near-ties or large-margin), and threshold sensitivity at
-$\tau\in\{0.05, 0.2\}$ preserves the direction of all decided comparisons.
-Pair representations used by learned models are constructed to be
-orientation-invariant (candidates serialized in canonical order;
-magnitude-based pair features), which removes label-orientation leakage; an
-early signed-difference variant was discarded for this reason before any
-confirmatory use.
+\stitle{Prospective utility and headroom.}
+For an unseen candidate $d$, raw prospective interventional utility is the
+change in downstream answer F1 obtained by injecting $d$ into the frozen
+state $s_t$ and resuming the same policy. For a relevance selector $R$,
+headroom is
+\begin{equation}
+H_R(s_t) = Y(d_{\mathrm{PIU}}) - Y(d_R),
+\label{eq:headroom}
+\end{equation}
+the difference between the best measured candidate and the selector's choice
+within the same intervention set $\mathcal{D}_t$. Two opportunity
+definitions are used and always reported separately: Opp.-Base, the fraction
+of states with at least one candidate whose raw intervention outcome
+strictly exceeds the base (no-intervention) continuation outcome; and
+Opp.-CE, the fraction of states with at least one candidate whose outcome
+strictly exceeds that of the CE-selected candidate. The substantive
+threshold $H\ge0.25$ F1 distinguishes answer-level changes from marginal
+fluctuations.
 
-\section{State-Delta Feature Definitions}
+\stitle{Prospective state-identification target.}
+The RQ3 gate predicts, before any intervention outcome is observed, the
+binary state-level label
+\begin{equation}
+Z(s_t) = \mathbb{1}[H_{\mathrm{CE}}(s_t) > 0],
+\label{eq:zlabel}
+\end{equation}
+i.e., whether the current state contains any candidate that would improve on
+the CE selection. Gates are evaluated by AUC and average precision against
+this retrospectively computed label; the label itself is never available to
+the gate.
+
+\stitle{Post-rollout scorer labels.}
+The exploratory continuation scorer is trained on candidate pairs whose
+preference labels are constructed from the raw downstream F1 outcomes of
+their continuations. Pairs whose outcome difference falls inside the
+preregistered tie zone ($\tau=0.1$) are excluded from training; this is the
+same tie zone used for pairwise outcome labels. F1 is used only to construct
+training labels and never appears among inference-time features.
+
+\stitle{Myopic utility.}
+For the post-hoc forced-answer analysis, myopic utility is defined
+analogously to PIU except that the continuation policy disables further
+retrieval and requires an immediate answer after candidate injection. The
+resulting outcome measures the candidate's immediate answer-support value
+under the frozen state while preventing any contribution from subsequent
+retrieval. This makes the utility label explicitly dependent on the
+continuation policy: the same candidate can carry different utility under
+the full policy and under the forced-answer policy.
+
+\section{Observable State, Candidate, and Continuation Features}
 \label{sec:features}
 
+\stitle{Pre-intervention features.}
 The interpretable feature vector $\varphi(s_t,d)$ asks what the candidate
 \emph{adds} relative to current knowledge.
 Content tokens are lowercased alphanumeric tokens with a fixed stopword list
@@ -242,233 +433,518 @@ original question and current query:
 \end{itemize}
 
 \noindent
-Semantic variants of alignment/novelty features (E5 embedding based) were
-additionally used in the gate campaign (Sec.~\ref{sec:secondary}).
-The refit coefficients reported in the main paper (Fig.~3; Table~S2) are logistic
-models without intercept over these fixed-scale normalized features (no
-z-scoring is applied) within CE-conflicting pairs.
+Semantic variants of the alignment and novelty features (E5 embedding based)
+are additionally used in the gate analyses (Sec.~\ref{sec:diagnostic}).
+These features are used descriptively in the winner characterization and as
+inputs to the prospective gates; all of them are computable before any
+intervention outcome is observed.
 
+\stitle{Post-rollout continuation features.}
+The exploratory continuation scorer additionally observes features of the
+realized continuation of each candidate: normalized CE score of the
+candidate; the number of additional searches in the continuation;
+termination indicators; trajectory length in tokens and turns; answer length
+and an empty-answer indicator; lexical support of the answer from the
+injected document; lexical support from subsequently retrieved evidence;
+agreement of the continuation answer with the base answer; and an indicator
+of whether the answer matches the modal answer among the top-3 CE
+candidates' continuations. These features require running the candidate's
+continuation and are therefore available only to the post-rollout scorer,
+never to the pre-intervention gates.
 
-\section{Exact-Value Tables Referenced from the Main Paper}
-\label{sec:tables}
+\section{Additional Diagnostic Results}
+\label{sec:diagnostic}
+
+\subsection{Where Utility Winners Appear in the Relevance Ranking}
+\label{sec:winnerrank}
+
+Table~\ref{tab:winnerrank} characterizes, among CE-relative opportunity
+states, the CE-rank position of utility-maximizing candidates. Winners
+concentrate near, but not at, the top of the relevance ranking.
+
+\stitle{Tie handling for winner-rank characterization.}
+When multiple candidates attain the same maximal downstream outcome within a
+state, we fractionally distribute that state's winner mass across all tied
+maximizers, analogously to the candidate-family attribution analysis. Top-$k$
+shares are therefore computed from tie-weighted winner mass, and median ranks
+from the corresponding weighted empirical distribution.
 
 \begin{table}[h]
 \centering
 \small
-\caption{\textbf{Table S1.} Prospective headroom beyond CE relevance
-selection (main paper Fig.~2). Oracle--CE is the question-level mean
-difference in downstream answer F1 with paired-bootstrap 95\% CI.
-Opportunity rates are measured on preregistered failure-enriched stratified
-samples and are not population-prevalence estimates.}
-\label{tab:s1}
+\caption{Tie-aware CE-rank position of utility-maximizing candidates among
+CE-relative opportunity states. When multiple candidates attain the same
+maximal downstream outcome, each receives equal fractional winner mass within
+the state. Top-2/Top-3 report tie-weighted winner mass within CE rank 2/3;
+median ranks are computed from the corresponding weighted empirical
+distribution, and the final column reports winner mass at CE rank $\ge5$.}
+\label{tab:winnerrank}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Setting} & \textbf{Opp. states} & \textbf{Median CE rank} &
+\textbf{Top-2} & \textbf{Top-3} & \textbf{Rank 5+} \\
+\midrule
+HotpotQA dev     & 81  & 4 & 17.3\% & 38.3\% & 34 \\
+HotpotQA lockbox & 129 & 3 & 33.3\% & 50.4\% & 42 \\
+2Wiki            & 164 & 4 & 23.8\% & 47.0\% & 58 \\
+Qwen2.5-14B      & 140 & 4 & 30.7\% & 45.7\% & 54 \\
+MuSiQue          & 187 & 4 & 17.1\% & 35.3\% & 84 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\stitle{Outcome-permutation characterization.}
+To describe which observable properties distinguish winning candidates, we
+compare each feature's observed winner statistic against a within-state
+outcome-permutation null. This analysis is exploratory and descriptive; the
+reported directions are associations under the tested null, not causal
+effects. Table~\ref{tab:permnull} summarizes how many of the five settings
+fall outside the permutation null for each feature.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Within-state outcome-permutation characterization of winning
+candidates (exploratory). ``Direction'' describes the observed tendency in
+the settings outside the null.}
+\label{tab:permnull}
+\begin{tabular}{lcl}
+\toprule
+\textbf{Feature} & \textbf{Settings outside null} & \textbf{Direction} \\
+\midrule
+Document length            & 5/5 & higher \\
+Current-query alignment    & 4/5 & higher \\
+Unresolved-term coverage   & 4/5 & higher \\
+$q_0$ alignment            & 3/5 & higher \\
+Redundancy                 & 3/5 & lower \\
+Novelty                    & 2/5 & mixed / limited \\
+Entity gain                & 0/5 & no consistent signal \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Detailed Prospective State-Identification Results}
+\label{sec:gatedetail}
+
+The RQ3 gate predicts $Z(s_t)=\mathbb{1}[H_{\mathrm{CE}}(s_t)>0]$ from
+pre-intervention information only: CE margin and CE score statistics,
+candidate-aggregate features, and probe signals. Table~\ref{tab:gateauc}
+reports discrimination of the full shallow gate; across post-hoc gate
+families, the best per-setting AUC ranges from 0.567 to 0.637, and CE margin
+or CE confidence alone performs approximately at chance.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Prospective state-identification AUC of the full shallow gate
+against $Z(s_t)$, by evaluation setting. Across post-hoc gate families, the
+best per-setting AUC ranges from 0.567 to 0.637; for Qwen2.5-14B the best
+family is the candidate-aggregate gate (0.568) rather than the full gate.}
+\label{tab:gateauc}
+\begin{tabular}{lc}
+\toprule
+\textbf{Setting} & \textbf{Full shallow gate AUC} \\
+\midrule
+HotpotQA dev     & 0.599 \\
+HotpotQA lockbox & 0.637 \\
+2Wiki            & 0.527 \\
+Qwen2.5-14B      & 0.560 \\
+MuSiQue          & 0.505 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Gate-family comparison on the HotpotQA lockbox (prevalence of
+$Z(s_t)=1$: 0.188). The full shallow gate attains an average-precision lift
+of 1.49 relative to prevalence.}
+\label{tab:gatefamily}
+\begin{tabular}{lc}
+\toprule
+\textbf{Gate family} & \textbf{Lockbox AUC} \\
+\midrule
+CE margin                    & 0.479 \\
+CE score statistics          & 0.494 \\
+Candidate aggregates ($\varphi$) & 0.547 \\
+MiniLM (fine-tuned)          & 0.500 \\
+DeBERTa (fine-tuned)         & 0.525 \\
+Full shallow gate            & 0.637 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Budgeted Lookahead and Simple Aggregation}
+\label{sec:lookahead}
+
+Table~\ref{tab:lookahead} reports the fraction of oracle headroom recovered
+when the intervention budget is limited to the top-$k$ CE-ranked candidates.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Fraction of Oracle--CE headroom recovered under a top-$k$
+CE-ranked intervention budget.}
+\label{tab:lookahead}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Setting} & \textbf{Oracle@2 recovery} & \textbf{Oracle@3 recovery} \\
+\midrule
+HotpotQA dev     & 30.9\% & 64.0\% \\
+HotpotQA lockbox & 46.4\% & 65.4\% \\
+2Wiki            & 37.3\% & 60.8\% \\
+Qwen2.5-14B      & 46.3\% & 70.6\% \\
+MuSiQue          & 32.2\% & 54.2\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+Recovery continues to rise with budget: 68.2--80.0\% of oracle headroom at
+$k=4$ and 85.8--95.2\% at $k=6$ across the five settings. Simple aggregation
+over the rolled-out candidates does not convert this budgeted signal into a
+selector: majority voting over top-$k$ continuation answers degrades
+performance relative to CE selection in every setting (negative recovery,
+$-5.9\%$ to $-58.0\%$ at $k\in\{4,6\}$), and early-termination heuristics are
+inconsistent across settings. One reason is answer modality: the useful
+oracle candidate's continuation answer matches the modal answer among top-3
+continuations in only 22.5--28.7\% of cases, whereas the CE candidate's
+answer is modal in 34.1--47.9\%; useful answers are disproportionately
+non-modal.
+
+\subsection{Exploratory Post-Rollout Continuation Scorer}
+\label{sec:scorer}
+
+An unconstrained selector was first evaluated and did not improve over CE on
+HotpotQA development (development gain: $-0.022$ F1). We therefore treat
+this variant as unsuccessful rather than selecting it for transfer
+evaluation. The reported variant is CE-sticky: it overrides the CE choice
+only when the scorer margin exceeds a threshold selected on HotpotQA
+development and then frozen for all non-development evaluations. This is a
+post-rollout reranker requiring up to $k$ continuation rollouts per state;
+it is not a pre-intervention selector, and its results are explicitly
+exploratory.
+
+\begin{table}[h]
+\centering
+\small
+\caption{CE-sticky post-rollout continuation scorer (exploratory).
+Overrides counts states where the scorer replaces the CE choice.}
+\label{tab:scorer}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Setting} & \textbf{$n$ (q / states)} & \textbf{$\Delta$F1} &
-\textbf{95\% CI} & \textbf{Opp.} \\
+\textbf{Setting} & \textbf{Overrides} & \textbf{Gain vs. CE} &
+\textbf{95\% CI} & \textbf{Oracle@3 recovered} \\
 \midrule
-HotpotQA dev (preregistered) & 297 / 579 & +0.082 & [0.062, 0.104] & 30.1\% \\
-HotpotQA lockbox (single-open) & 350 / 686 & +0.117 & [0.092, 0.142] & 29.3\% \\
-2WikiMultiHopQA & 350 / 819 & +0.142 & [0.117, 0.168] & 26.4\% \\
-Qwen2.5-14B trajectories & 350 / 838 & +0.097 & [0.076, 0.120] & 32.1\% \\
-MuSiQue & 349 / 959 & +0.097 & [0.080, 0.116] & 21.8\% \\
+HotpotQA dev     & 12/579 & +0.0011 & [$-$0.003, 0.005]  & 2.1\% \\
+HotpotQA lockbox & 13/686 & +0.0035 & [0.0007, 0.0071]   & 4.6\% \\
+2Wiki            & 39/819 & +0.0075 & [0.0017, 0.0143]   & 8.7\% \\
+Qwen2.5-14B      & 49/838 & +0.0096 & [0.0025, 0.0172]   & 14.0\% \\
+MuSiQue          & 58/959 & +0.0004 & [$-$0.004, 0.005]  & 0.8\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
+\noindent
+The continuation scorer is fit only on the designated training split; the
+CE-sticky margin is selected on HotpotQA development and then frozen for all
+non-development evaluations.
+
+\subsection{Trajectory Decomposition}
+\label{sec:trajdecomp}
+
+The main paper reports the lockbox decomposition in detail together with the
+query-change stratum for the remaining settings; the full per-setting table
+(strata: no search / all / any search / both search / query changed, with
+state counts, headroom confidence intervals, and Opp.-CE) is provided with
+the frozen analysis reports in the repository. On the lockbox, the
+query-changed stratum ($n=175$) shows headroom of +0.311 [0.244, 0.380] with
+Opp.-CE of 44.6\%. The decomposition is computed over the post-intervention
+behavior of the two compared arms ($d_{\mathrm{PIU}}$ and $d_{\mathrm{CE}}$);
+its denominator therefore differs from the all-arm average of 0.62
+additional search steps reported in Sec.~\ref{sec:agent}. Post-intervention
+strata are descriptive and should not be interpreted causally.
+
+\subsection{Myopic Utility versus Full Prospective Utility}
+\label{sec:myopic}
+
+The trajectory decomposition above is descriptive because its strata are
+defined after intervention. We therefore conduct a complementary
+forced-answer analysis on the HotpotQA lockbox. For each frozen state and
+candidate, the full-PIU arm injects the candidate and resumes the normal
+greedy continuation policy, whereas the myopic arm injects the same
+candidate but disables further retrieval and requires an immediate answer.
+All other state, candidate, and evaluation conditions are held fixed.
+Retrieval-free myopic utility is moderately correlated with full PIU
+(candidate-level Spearman $\rho=0.652$), but its within-state ordering is
+much coarser: mean within-state Spearman correlation is 0.392 and the
+myopic maximum is tied in 84.1\% of states. Among CE-relative opportunity
+states, strict winner agreement with full PIU is only 27.1\%. The myopic
+oracle still exhibits substantial headroom (+0.083 F1, 95\% CI
+[0.063, 0.104]), showing that immediate answer effects are real. However,
+when ties are resolved in favor of CE, myopic selection gains only +0.015 F1
+[0.003, 0.027] on full-continuation outcomes, recovering 12.7\% of the full
+Oracle--CE headroom. Thus, immediate answer improvement alone is
+insufficient to identify which evidence is most valuable under continued
+search.
+
 \begin{table}[h]
 \centering
 \small
-\caption{\textbf{Table S2.} Refit logistic coefficients within
-CE-conflicting pairs (no intercept, standardized features; main paper
-Fig.~3). Parentheses give bootstrap sign stability (500 resamples).
-Query alignment and document length are confirmatory; redundancy and
-novelty are exploratory.}
-\label{tab:s2}
-\begin{tabular}{lrrrr}
+\caption{Post-hoc forced-answer comparison of myopic utility and full PIU on
+the HotpotQA lockbox.}
+\label{tab:myopic}
+\begin{tabular}{lc}
 \toprule
-\textbf{Setting} & \textbf{Query align.} & \textbf{Doc. length} &
-\textbf{Redundancy} & \textbf{Novelty} \\
+\textbf{Quantity} & \textbf{Result} \\
 \midrule
-HotpotQA dev & $-$2.54 (1.00) & $-$3.37 (1.00) & +1.06 (1.00) & +0.50 (0.96) \\
-Lockbox      & $-$2.45 (1.00) & $-$2.73 (1.00) & $-$1.41 (0.998) & $-$0.21 (0.77) \\
-2Wiki        & $-$1.91 (1.00) & $-$3.82 (1.00) & +1.14 (0.99) & +1.74 (1.00) \\
-Qwen2.5-14B  & $-$2.93 (1.00) & $-$2.16 (1.00) & $-$1.79 (1.00) & $-$0.29 (0.78) \\
-MuSiQue      & $-$2.19 (1.00) & $-$2.00 (1.00) & +1.76 (1.00) & +1.18 (1.00) \\
+Candidate-level Spearman $\rho$ & .652 \\
+Mean within-state Spearman & .392 \\
+States with tied myopic maximum & 84.1\% \\
+Strict winner agreement (opportunity states) & 27.1\% \\
+Full Oracle--CE & +.117 [.092,.142] \\
+Myopic Oracle--CE & +.083 [.063,.104] \\
+Myopic selection on full outcomes & +.015 [.003,.027] \\
+Full headroom recovered & 12.7\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\section{Case Study: Full Trajectories}
-\label{sec:case}
+\section{Robustness and Sensitivity Results}
+\label{sec:robustness}
 
-The main-paper case (Table~1 there) is lockbox state
-\texttt{5ae5d06a\ldots::s1}.
-\emph{Question:} ``From which team did the linebacker for four NFL teams
-between 1985--1996 get fired by on November 29?'' (gold: the Jacksonville
-Jaguars).
-\emph{State $s_1$:} the agent's first search
-(``linebacker who played for four nfl teams between 1985-1996'') returned
-\emph{Jack Del Rio} (``head coach of the Oakland Raiders \ldots A
-linebacker for four NFL teams between 1985--1996''), \emph{Dan Brandenburg},
-and \emph{Fredd Young}.
-The agent's visible reasoning at this point reads: ``Jack Del Rio is the
-only one who fits the criteria \ldots I need to find out which team fired
-him on November 29.''
+\stitle{Exact random selection and representative strata.}
+The random baseline is computed in closed form as the exact expectation of a
+uniform draw over $\mathcal{D}_t$ (the uniform average of the candidate
+outcomes), and compared with CE selection using paired question-level
+confidence intervals. CE selection is significantly better than this exact
+random baseline in all five settings (CE $-$ Random from +0.0228 to +0.0720
+F1), so the reported headroom is measured beyond a genuinely informative
+baseline. On the representative non-enriched strata, the Oracle--CE effect
+persists: question-level estimates range from +0.062 to +0.159 F1 across the
+five settings, with every confidence interval excluding zero. Failure
+enrichment therefore does not create the Oracle--CE effect; it only
+concentrates evaluation on states where selection matters.
 
-\stitle{Base continuation (no intervention).}
-Four further searches (``Jack Del Rio fired by on November 29'', ``\ldots
-fired date'', ``\ldots fired by which team \ldots'') fail to surface the
-2011 Jaguars firing; the agent answers ``Oakland Raiders'' (F1 0).
-
-\stitle{CE-selected candidate (pool CE rank 1): \emph{Wilber Marshall}}
-(60 tokens; ``\ldots was a linebacker in the National Football League (NFL)
-for five teams from 1984 until 1995 \ldots'').
-Continuation: the agent immediately searches ``Wilber Marshall fired on
-November 29'' and answers ``Dallas Cowboys'' (F1 0).
-The document is the most query-aligned candidate in the pool but concerns a
-different entity; it displaces a correct hypothesis.
-
-\stitle{Useful candidate (pool CE rank 15; \emph{redundancy} family;
-non-gold): \emph{Kevin Hardy (linebacker)}}
-(70 tokens; ``\ldots he played professionally for the Jacksonville Jaguars,
-Dallas Cowboys, and Cincinnati Bengals of the NFL'').
-Continuation: the agent keeps the Del Rio hypothesis, issues one search
-(``Jack Del Rio fired by on November 29''), and answers ``Jacksonville
-Jaguars'' (F1 1).
-Interpretable features: query alignment 0.50 (identical to the CE-selected
-document's 0.50), novelty 0.51, redundancy 0.35.
-
-\stitle{Matched control (\emph{Fredd Young}; same BM25 rank bucket, 63
-tokens).}
-Continuation reproduces the base failure pattern (four searches, wrong
-answer), so the useful candidate's effect is not attributable to generic
-context expansion.
-(This control happens to be a document already present in the context; see
-the note on control matching below.)
-
-\stitle{Caveats.}
-PIU records the realized downstream effect: the agent's visible reasoning
-never cites the injected Kevin Hardy document, so the mechanism is the
-availability of the missing entity in context rather than explicit
-citation.
-This state is outside the 20\% replay-audited subset (single greedy
-continuation per arm).
-The case was selected from lockbox states satisfying (i) base and
-CE-selected outcomes F1 $<0.3$, (ii) a non-gold, non-CE-top candidate with
-F1 $\ge0.9$ and pool CE rank $\ge4$; 25 states met these criteria and this
-one was chosen for interpretability of the mechanism.
-
-\stitle{Note on control matching.}
-Matched controls are drawn from the BM25 top-100 under $q_t$ subject to the
-rank-bucket, length, title-overlap, and non-gold constraints; documents
-already present in the agent's context are \emph{not} excluded by the
-matching code.
-This occurs for 8.4--10.0\% of controls across settings (lockbox: 648 of
-7{,}120) and amounts to a near-duplicate injection, i.e., a conservative
-control.
-All confirmatory endpoints (opportunity, Oracle--CE headroom, pairwise
-labels, specialist and gate evaluations) are computed from the raw
-intervention outcome $Y(s_t,E_{<t}\cup\{d\})$ and are unaffected;
-controlled PIU is a diagnostic quantity.
-
-\section{Additional Figures}
-\label{sec:figs}
-
-Figure~\ref{fig:replication} summarizes the frozen-specialist transfer together
-with the coefficient sign matrix across all five settings (the coefficient
-plot itself appears as main-paper Fig.~3; exact values in Table~S2).
-
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.98\textwidth]{fig4_replication.pdf}
-\caption{Structure replication. (a) Pair-level transfer of the frozen
-HotpotQA-7B conflicting-condition specialist with question-clustered 95\%
-confidence intervals where preregistered. (b) Coefficient sign by setting;
-the top two rows are the confirmatory signatures.}
-\label{fig:replication}
-\end{figure}
-
-\section{Additional Quantitative Results}
-\label{sec:secondary}
-
-\stitle{Effect-size decomposition (full).}
-Table~\ref{tab:effectsize} reports opportunity rates at increasing
-thresholds of the best available downstream improvement.
+\stitle{Opportunity magnitude.}
+Table~\ref{tab:oppmag} decomposes both opportunity definitions by effect
+threshold. By definition, Opp.-Base $\ge$ Opp.-CE within every row, and
+$>0$ rates bound the $\ge.25$ rates within each definition.
 
 \begin{table}[h]
 \centering
 \small
-\caption{Fraction of evaluated states whose best candidate exceeds the given
-downstream $\Delta$F1 threshold.}
-\label{tab:effectsize}
+\caption{Opportunity rates under both definitions and effect thresholds.}
+\label{tab:oppmag}
 \begin{tabular}{lcccc}
 \toprule
-\textbf{Setting} & $\Delta F1>0$ & $\ge 0.05$ & $\ge 0.10$ & $\ge 0.25$ \\
+\textbf{Setting} & \textbf{Opp.-Base $>0$} & \textbf{Opp.-Base $\ge.25$} &
+\textbf{Opp.-CE $>0$} & \textbf{Opp.-CE $\ge.25$} \\
 \midrule
-HotpotQA lockbox & 29.3\% & 29.3\% & 28.7\% & 27.8\% \\
-2Wiki            & 26.4\% & 26.1\% & 26.0\% & 24.8\% \\
-Qwen2.5-14B      & 32.1\% & 31.9\% & 31.1\% & 29.1\% \\
+HotpotQA dev     & 30.1\% & 26.4\% & 14.0\% & 12.4\% \\
+HotpotQA lockbox & 29.3\% & 27.8\% & 18.8\% & 16.9\% \\
+2Wiki            & 26.4\% & 24.8\% & 20.0\% & 17.6\% \\
+Qwen2.5-14B      & 32.1\% & 29.1\% & 16.7\% & 14.3\% \\
+MuSiQue          & 21.8\% & 18.8\% & 19.5\% & 16.1\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\stitle{Exchangeability check: CE is a serious baseline.}
-Under a null in which the CE choice is exchangeable with a random pool member,
-the oracle$-$random gain on the lockbox would be $+0.155$
-(95\% null interval $[0.141, 0.169]$), whereas the observed oracle$-$CE gain
-is $+0.117$.
-CE selection is therefore significantly better than random selection within
-the same pools; the reported headroom is measured \emph{beyond} a genuinely
-informative baseline.
+\stitle{Noise, replay, and cross-fitted robustness.}
+Label reliability on the replay-audited subset is 97.8--99.0\% (three
+greedy continuations per intervention on 20\% of states; 115/579 primary
+states and 137/686 lockbox states). A fresh 150-question cross-fitted
+experiment separates candidate selection from outcome evaluation using two
+independent rollout sets, yielding an Oracle--CE estimate of +0.111 F1
+(95\% CI [0.080, 0.144]), nearly identical to the naive +0.114 estimate on
+the same sample (A$\to$B: +0.117; B$\to$A: +0.104).
 
-\stitle{Gate and predictor campaign summary.}
-Deployment-time models were developed strictly on development data and frozen
-before lockbox evaluation.
-Standalone pairwise utility prediction reached 57.0\% (v1) and at most 59.3\%
-(v2) accuracy; on CE-disagreement pairs it remained below chance (39--47\%),
-while CE relevance alone reached 53.1\% and CE combined with measured-utility
-features 62.1\%.
-For explicit CE-conflict identification, four gate families of increasing
-capacity (lexical/retrieval statistics; CE-score distribution and probe
-signals; semantic state--candidate representations; a fine-tuned transformer
-gate) converged to development AUC 0.61--0.69; the frozen ensemble achieved
-0.641 on the lockbox, and the resulting deployable mixture recovered
-approximately none of the oracle-condition routing advantage
-(recovery $\approx -0.02$; main paper Fig.~4).
-Oracle-condition routing itself is stable at 71--76\% across all five
-settings (76.0 / 76.2 / 71.2 / 75.2 / 71.7\%).
+\stitle{Post-hoc sampled-decoding policy sensitivity.}
+To avoid selecting and evaluating the oracle candidate on the same
+stochastic realization, we use held-out replicate evaluation. For each
+fold, candidate selection is performed using the remaining sampled
+replicates and the selected candidate is evaluated on the held-out
+replicate. Across the full 686-state lockbox, the three held-out
+Oracle--CE estimates are +0.0298, +0.0281, and +0.0407 F1. Thus, realized
+PIU remains positive under sampled continuation but is substantially
+smaller than under the primary greedy policy, demonstrating policy
+dependence. The sampled-decoding runs use $T=0.7$, top-$p=1.0$, with fixed
+seeds 101, 102, and 103; prompts, stop sequences, parsing, retrieval, and
+search-budget logic are otherwise unchanged.
 
-\stitle{Gold is not sufficient either.}
-Among gold-labeled candidate documents in the main Gate-1 analysis, 74.2\% did not
-improve the downstream outcome at their state (62.9\% in the preregistered
-Gate-2 sample); in a weakened-agent stress condition this fell to 37.5\%,
-showing that even ground-truth supporting evidence has state-dependent
-utility.
+\stitle{Matched intervention controls.}
+The selection-specific controlled contrast is the primary control estimand:
+for the candidates actually selected by CE and by the PIU oracle,
+Table~\ref{tab:matchedcontrol} reports each selection's outcome relative to
+its matched control and the resulting controlled Oracle--CE contrast.
 
-\stitle{Context pollution.}
-Omission interventions (I1) show that removing already-consumed non-gold
-evidence improves downstream answer F1 by $+0.057$ on average ($n=330$
-omission arms), while removing gold evidence harms performance more than
-removing non-gold evidence --- an independent sanity check of the measurement
-and complementary evidence that additional relevant-looking context is not
-uniformly beneficial.
+\begin{table}[h]
+\centering
+\small
+\caption{Selection-specific matched-control contrasts (F1).}
+\label{tab:matchedcontrol}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Setting} & \textbf{CE $-$ control} & \textbf{Oracle $-$ control} &
+\textbf{Controlled Oracle$-$CE} \\
+\midrule
+HotpotQA dev     & +0.085 & +0.160 & +0.075 \\
+HotpotQA lockbox & +0.044 & +0.152 & +0.109 \\
+2Wiki            & +0.025 & +0.164 & +0.138 \\
+Qwen2.5-14B      & +0.066 & +0.162 & +0.097 \\
+MuSiQue          & +0.030 & +0.113 & +0.083 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\stitle{Search-termination utility.}
-Interventions can change search behavior itself: the fraction of continuations
-that terminate search immediately after the intervention rises from 7.1\% to
-12.9\% under the stress condition, indicating that part of a document's value
-lies in enabling the agent to stop searching.
+\noindent
+The paired controlled Oracle$-$CE contrast excludes zero in all five
+settings (e.g., HotpotQA dev +0.0748 [0.0516, 0.0992]; 2Wiki +0.1383
+[0.1103, 0.1678]). The near-zero all-arm average is not the primary
+selection-specific estimand: many intervention candidates are never
+selected by either CE or the oracle. For the candidates actually selected by
+CE and by the PIU oracle, the controlled contrast remains positive in all
+five settings. On the lockbox, the all-arm controlled average is +0.0060 F1
+with a 95\% CI of [$-$0.0017, 0.0137]; excluding controls already present in
+the agent context changes it only slightly (+0.0060 to +0.0051; exclusion CI
+[$-$0.0027, 0.0127]), and for interventions assigned a second independently
+sampled control, effect signs agree in 87--91\% of cases.
 
-\stitle{Where opportunities live.}
-Opportunities concentrate in base-failure states (37.5\% of failure states vs.\
-0.8\% of success states in the development analysis), motivating the
-failure-enriched confirmatory sampling; the representative (unenriched)
-development sample retains an 18.5\% opportunity rate.
+\stitle{Additional matching-specification sensitivity.}
+As a post-hoc exploratory robustness analysis, we reran all 5{,}487 lockbox
+interventions using three relaxed control-matching specifications: removing
+the BM25 rank-bucket constraint, removing the document-length constraint, or
+removing both. The resulting all-arm controlled estimates are +0.0099,
++0.0089, and +0.0086 F1, respectively, compared with +0.0060 under the full
+confirmatory specification (Table~\ref{tab:matchspec}); relaxing the
+matching constraints therefore does not attenuate the diagnostic.
+Table~\ref{tab:matchcheck} verifies that the relaxed specifications actually
+change the sampled controls.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Post-hoc sensitivity to matched-control specifications on the
+HotpotQA lockbox. Estimates are question-level means with question-bootstrap
+95\% confidence intervals.}
+\label{tab:matchspec}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Matching specification} & \textbf{Mean $\Delta$F1} & \textbf{95\% CI} \\
+\midrule
+Full confirmatory & +0.0060 & [$-$0.0017, 0.0137] \\
+No rank bucket    & +0.0099 & [0.0024, 0.0177] \\
+No length         & +0.0089 & [0.0009, 0.0171] \\
+Neither           & +0.0086 & [0.0006, 0.0167] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Manipulation check for relaxed control-matching specifications.}
+\label{tab:matchcheck}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Specification} & \textbf{Rank-bucket match} &
+\textbf{Length within $\pm25\%$} & \textbf{Fallback} \\
+\midrule
+No rank bucket & 11.0\% & 97.0\% & 0.3\% \\
+No length      & 59.4\% & 22.3\% & 1.8\% \\
+Neither        & 9.8\%  & 20.6\% & 0.1\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\stitle{Oracle tie handling.}
+The intervention pipeline resolves equal maxima by the fixed candidate
+enumeration order bm25\_top $\to$ dense\_top $\to$ ce\_top $\to$ mid\_rel
+$\to$ novelty $\to$ redundancy $\to$ entity\_bridge $\to$ random. On the
+HotpotQA lockbox, 580 of 686 states have multiple candidates tied at the
+maximum raw utility; most of these ties occur because the maximum utility is
+zero. Among states with a positive maximum, 100 states (14.6\% of all
+lockbox states) contain a tied maximizer. This tie rule cannot change
+Oracle--CE headroom because tied candidates have identical downstream F1
+within the state, but it can affect descriptive candidate attribution and
+winner-rank statistics. We therefore use fractional tie weighting for both
+candidate-family attribution and the winner-rank characterization
+(Sec.~\ref{sec:winnerrank}). For this reason, family shares below divide
+oracle-winning mass fractionally across tied maximizers.
+
+\stitle{Candidate-family attribution.}
+Because multiple candidates can attain the same maximal downstream outcome,
+assigning each state to the first enumerated maximizer biases family
+counts. We therefore fractionally divide each state's oracle-winning mass
+across all tied maximizers. Under this tie-split attribution, the three
+standard-retrieval candidate families (bm25\_top, dense\_top, and ce\_top)
+account for 56.8\% of oracle-winning mass, while the five auxiliary
+families account for 43.2\%. Table~\ref{tab:family} reports the per-family
+breakdown, and Table~\ref{tab:poolsens} extends the pool-sensitivity
+analysis to all five evaluation settings.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Candidate-family attribution on the HotpotQA lockbox (686 states;
+201 states with a positive opportunity). Oracle-winning mass is fractionally
+divided across candidates tied at the maximum downstream outcome. The final
+column applies the pipeline's fixed first-maximum tie rule and is shown only
+to illustrate enumeration bias.}
+\label{tab:family}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Family} & \textbf{Mean $U$} & \textbf{Tie-split share} &
+\textbf{First-max share} \\
+\midrule
+bm25\_top      & +0.0180 & 8.9\%  & 25.4\% \\
+dense\_top     & +0.0638 & 25.7\% & 33.3\% \\
+ce\_top        & +0.0652 & 22.2\% & 21.9\% \\
+mid\_rel       & +0.0182 & 7.1\%  & 3.0\% \\
+novelty        & +0.0239 & 8.7\%  & 6.0\% \\
+redundancy     & +0.0172 & 9.0\%  & 4.0\% \\
+entity\_bridge & +0.0210 & 9.4\%  & 4.5\% \\
+random         & +0.0255 & 8.9\%  & 2.0\% \\
+Standard retrieval & --- & 56.8\% & --- \\
+Auxiliary families & --- & 43.2\% & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Candidate-pool sensitivity across all five evaluation settings.
+Standard and auxiliary columns show tie-split oracle-winning mass.
+Standard-only headroom restricts the oracle to BM25, dense-retrieval, and CE
+candidates. Bracketed values are question-level 95\% confidence intervals.}
+\label{tab:poolsens}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Setting} & \textbf{Standard} & \textbf{Aux.} &
+\textbf{Full headroom} & \textbf{Standard-only} \\
+\midrule
+HotpotQA dev     & 60.0\% & 40.0\% & +0.082 & +0.042 [0.029, 0.058] \\
+HotpotQA lockbox & 56.8\% & 43.2\% & +0.117 & +0.078 [0.059, 0.100] \\
+2Wiki            & 50.4\% & 49.6\% & +0.142 & +0.083 [0.064, 0.104] \\
+Qwen2.5-14B      & 61.8\% & 38.2\% & +0.097 & +0.071 [0.053, 0.091] \\
+MuSiQue          & 42.0\% & 58.0\% & +0.097 & +0.047 [0.035, 0.060] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+Restricting the intervention pool to standard retrieval candidates leaves
+positive Oracle--CE headroom in all five settings, with every
+question-level 95\% confidence interval excluding zero. Auxiliary
+candidates are not inert: they account for 38--58\% of tie-split
+oracle-winning mass across settings, with the largest share on MuSiQue.
 
 \stitle{Cost accounting.}
-96.2\% of rollout token cost is prompt tokens (context replay), implying that
-amortized approximations of prospective intervention should target context
-reuse rather than generation length.
+96.2\% of rollout token cost is prompt tokens (context replay), implying
+that amortized approximations of prospective intervention should target
+context reuse rather than generation length.
 
 \section{Reproducibility}
 \label{sec:repro}
@@ -476,20 +952,37 @@ reuse rather than generation length.
 \stitle{Software and hardware.}
 vLLM 0.10.2, PyTorch 2.8.0 (CUDA 12.8), Transformers 4.55.2,
 \texttt{bm25s} 0.3.10, scikit-learn 1.9.0, Python 3.11; NVIDIA H100 80GB.
-Greedy decoding throughout; fixed seeds for sampling, stratification, and
-control matching.
+Confirmatory evaluations use greedy decoding; fixed seeds are used for
+sampling, stratification, and control matching. The post-hoc
+sampled-decoding sensitivity analysis uses $T=0.7$, top-$p=1.0$, with fixed
+seeds 101, 102, and 103.
 
 \stitle{Scale of the study.}
-Per-setting confirmatory sizes (questions\,/\,states\,/\,conflicting pairs): HotpotQA dev 297\,/\,579\,/\,---; lockbox 350\,/\,686\,/\,1{,}639;
-2Wiki 350\,/\,819\,/\,1{,}684; Qwen2.5-14B 350\,/\,838\,/\,1{,}930;
-MuSiQue 349\,/\,959\,/\,2{,}014.
-The cross-fitted oracle uses 150 fresh questions with two independent rollout
-sets.
+Per-setting confirmatory sizes (questions\,/\,frozen states): HotpotQA dev
+297\,/\,579; lockbox 350\,/\,686; 2Wiki 350\,/\,819; Qwen2.5-14B
+350\,/\,838; MuSiQue 349\,/\,959. The cross-fitted oracle uses 150 fresh
+questions with two independent rollout sets. The post-hoc choice-space
+expansion adds 3{,}861 full-pool BGE/BGE-State intervention arms. The
+sampled-decoding sensitivity evaluates 6{,}173 lockbox base/intervention
+arms under three independent stochastic replicates. The post-hoc Phi-4
+cross-family replication uses a representative, non-enriched 350-question
+HotpotQA sample containing 860 frozen states and 6{,}870 intervention arms.
+The forced-answer myopic analysis evaluates 6{,}173 lockbox arms (686 base
+continuations and 5{,}487 candidate interventions), with retrieval disabled
+after candidate injection.
+
+\stitle{Analysis provenance.}
+The continuation scorer is fit only on the designated training split; the
+CE-sticky margin is selected on HotpotQA development and then frozen for
+all non-development evaluations. All post-hoc analyses (choice-space
+expansion, winner characterization, lookahead, scorer, sampled decoding,
+Phi-4 cross-family replication, myopic-utility analysis, and matching
+sensitivity) are labeled as such in the frozen reports.
 
 \stitle{Code and records.}
-Anonymized code, the preregistration document, and frozen per-gate reports are
-available at the repository linked in the abstract.
-All confirmatory numbers in the main paper trace to a preregistered criterion
-and a frozen report file in that repository.
+Anonymized code, the preregistration document, and frozen analysis reports
+are available at the repository linked in the abstract. All confirmatory
+numbers in the main paper trace to a preregistered criterion and a frozen
+report file in that repository.
 
 \end{document}
